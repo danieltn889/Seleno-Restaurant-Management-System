@@ -38,7 +38,7 @@ class PaymentController extends BaseController {
         $id = $model->create($requestData);
         if ($id) {
             $status = $model->getPaymentStatus($requestData['order_id']);
-            return $this->success('Payment added', ['payment_status' => $status['payment_status']]);
+            return $this->success('Payment added', ['payment_status' => $status['status']]);
         }
         return $this->error('Failed to add payment');
     }

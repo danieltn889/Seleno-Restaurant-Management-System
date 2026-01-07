@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seleno Restaurant - API Tester</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
         .section-card {
@@ -91,211 +91,40 @@
                     <div class="card-body">
                         <h6 class="card-title mb-3">📋 Navigation</h6>
                         <ul class="nav flex-column">
-                            <!-- User Management -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#users" data-bs-toggle="collapse" data-bs-target="#userSubmenu" aria-expanded="false">
-                                    👥 User Management <i class="bi bi-chevron-down float-end"></i>
+                                <a class="nav-link active" href="#users">
+                                    👥 User Management
                                 </a>
-                                <div class="collapse" id="userSubmenu">
-                                    <ul class="nav flex-column ms-3">
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'addUser', this)">
-                                                ➕ Add User
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'listUsers', this)">
-                                                📋 List Users
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'updateUser', this)">
-                                                ✏️ Update User
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'deleteUser', this)">
-                                                🗑️ Delete User
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </li>
-
-                            <!-- Inventory Management -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#inventory" data-bs-toggle="collapse" data-bs-target="#inventorySubmenu" aria-expanded="false">
-                                    📦 Inventory Management <i class="bi bi-chevron-down float-end"></i>
+                                <a class="nav-link" href="#inventory">
+                                    📦 Inventory Management
                                 </a>
-                                <div class="collapse" id="inventorySubmenu">
-                                    <ul class="nav flex-column ms-3">
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('inventoryTab', 'stockCategories', this)">
-                                                📁 Stock Categories
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('inventoryTab', 'stockGroups', this)">
-                                                📂 Stock Groups
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('inventoryTab', 'stockItemCategories', this)">
-                                                🏷️ Item Categories
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('inventoryTab', 'stocks', this)">
-                                                📦 Stocks
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('inventoryTab', 'stockIn', this)">
-                                                📥 Stock In
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('inventoryTab', 'stockOut', this)">
-                                                📤 Stock Out
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </li>
-
-                            <!-- Menu Management -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#menu" data-bs-toggle="collapse" data-bs-target="#menuSubmenu" aria-expanded="false">
-                                    🍽️ Menu Management <i class="bi bi-chevron-down float-end"></i>
+                                <a class="nav-link" href="#menu">
+                                    🍽️ Menu Management
                                 </a>
-                                <div class="collapse" id="menuSubmenu">
-                                    <ul class="nav flex-column ms-3">
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('menuTab', 'menuGroups', this)">
-                                                📂 Category Groups
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('menuTab', 'menuCategories', this)">
-                                                📁 Categories
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('menuTab', 'menus', this)">
-                                                🍽️ Menus
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('menuTab', 'menuItems', this)">
-                                                🍕 Menu Items
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </li>
-
-                            <!-- Tables Management -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#tables" data-bs-toggle="collapse" data-bs-target="#tablesSubmenu" aria-expanded="false">
-                                    🪑 Tables Management <i class="fas fa-chevron-down float-end"></i>
+                                <a class="nav-link" href="#tables">
+                                    🪑 Tables Management
                                 </a>
-                                <div class="collapse" id="tablesSubmenu">
-                                    <ul class="nav flex-column ms-3">
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('tablesTab', 'tableGroups', this)">
-                                                📂 Table Groups
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('tablesTab', 'tablesList', this)">
-                                                🪑 Tables
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </li>
-
-                            <!-- Orders Management -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#orders" data-bs-toggle="collapse" data-bs-target="#ordersSubmenu" aria-expanded="false">
-                                    📋 Orders Management <i class="bi bi-chevron-down float-end"></i>
+                                <a class="nav-link" href="#orders">
+                                    📋 Orders Management
                                 </a>
-                                <div class="collapse" id="ordersSubmenu">
-                                    <ul class="nav flex-column ms-3">
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('ordersTab', 'specialOrders', this)">
-                                                ⭐ Special Orders
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('ordersTab', 'orderMain', this)">
-                                                📋 Orders
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </li>
-
-                            <!-- Payments -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#payments" data-bs-toggle="collapse" data-bs-target="#paymentsSubmenu" aria-expanded="false">
-                                    💳 Payments <i class="bi bi-chevron-down float-end"></i>
+                                <a class="nav-link" href="#payments">
+                                    💳 Payments
                                 </a>
-                                <div class="collapse" id="paymentsSubmenu">
-                                    <ul class="nav flex-column ms-3">
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('paymentsTab', 'addPayment', this)">
-                                                ➕ Add Payment
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('paymentsTab', 'checkPayment', this)">
-                                                🔍 Check Status
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </li>
-
-                            <!-- Reports -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#reports" data-bs-toggle="collapse" data-bs-target="#reportsSubmenu" aria-expanded="false">
-                                    📊 Reports <i class="bi bi-chevron-down float-end"></i>
+                                <a class="nav-link" href="#reports">
+                                    📊 Reports
                                 </a>
-                                <div class="collapse" id="reportsSubmenu">
-                                    <ul class="nav flex-column ms-3">
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('reportsTab', 'salesReport', this)">
-                                                💰 Sales
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('reportsTab', 'inventoryReport', this)">
-                                                📦 Inventory
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('reportsTab', 'stockMovement', this)">
-                                                📈 Stock Movement
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('reportsTab', 'orderReport', this)">
-                                                📋 Orders
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('reportsTab', 'paymentReport', this)">
-                                                💳 Payments
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('reportsTab', 'userActivity', this)">
-                                                👥 User Activity
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </li>
                         </ul>
 
@@ -338,102 +167,78 @@
                         <h5 class="mb-0">👥 User Management</h5>
                     </div>
                     <div class="card-body">
-                        <!-- Navigation tabs for users -->
-                        <ul class="nav nav-tabs mb-3" id="usersTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#addUser">Add User</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#listUsers">List Users</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#updateUser">Update User</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#deleteUser">Delete User</button>
-                            </li>
-                        </ul>
-
-                        <div class="tab-content">
-                            <!-- Add User Tab -->
-                            <div class="tab-pane fade show active" id="addUser">
-                                <div class="row">
-                                    <div class="col-md-6 offset-md-3">
-                                        <div class="card">
-                                            <div class="card-header bg-primary text-white py-2">
-                                                <h6 class="mb-0">Add User <span class="endpoint-badge badge method-post">POST</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn" data-modal="userAddModal">
-                                                    Open Add Form
-                                                </button>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Open modal to add a new user</small>
-                                                </div>
-                                            </div>
+                        <div class="row">
+                            <!-- Add User -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-primary text-white py-2">
+                                        <h6 class="mb-0">Add User <span
+                                                class="endpoint-badge badge method-post">POST</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                            data-modal="userAddModal">
+                                            Open Add Form
+                                        </button>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Open modal to add a new user</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- List Users Tab -->
-                            <div class="tab-pane fade" id="listUsers">
-                                <div class="row">
-                                    <div class="col-md-6 offset-md-3">
-                                        <div class="card">
-                                            <div class="card-header bg-info text-white py-2">
-                                                <h6 class="mb-0">List Users <span class="endpoint-badge badge method-get">GET</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <button class="api-btn btn btn-info btn-sm w-100" data-endpoint="users/list" data-method="GET">
-                                                    List All Users
-                                                </button>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Returns all users in the system</small>
-                                                </div>
-                                            </div>
+                            <!-- List Users -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-info text-white py-2">
+                                        <h6 class="mb-0">List Users <span
+                                                class="endpoint-badge badge method-get">GET</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="api-btn btn btn-info btn-sm w-100" data-endpoint="users/list"
+                                            data-method="GET">
+                                            List All Users
+                                        </button>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Returns all users in the system</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Update User Tab -->
-                            <div class="tab-pane fade" id="updateUser">
-                                <div class="row">
-                                    <div class="col-md-6 offset-md-3">
-                                        <div class="card">
-                                            <div class="card-header bg-warning text-white py-2">
-                                                <h6 class="mb-0">Update User <span class="endpoint-badge badge method-put">PUT</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <button class="btn btn-warning btn-sm w-100 open-modal-btn" data-modal="userUpdateModal">
-                                                    Open Update Form
-                                                </button>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Open modal to update user details</small>
-                                                </div>
-                                            </div>
+                            <!-- Update User -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-warning text-white py-2">
+                                        <h6 class="mb-0">Update User <span
+                                                class="endpoint-badge badge method-put">PUT</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                            data-modal="userUpdateModal">
+                                            Open Update Form
+                                        </button>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Open modal to update user details</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Delete User Tab -->
-                            <div class="tab-pane fade" id="deleteUser">
-                                <div class="row">
-                                    <div class="col-md-6 offset-md-3">
-                                        <div class="card">
-                                            <div class="card-header bg-danger text-white py-2">
-                                                <h6 class="mb-0">Delete User <span class="endpoint-badge badge method-delete">DELETE</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <button class="btn btn-danger btn-sm w-100 open-modal-btn" data-modal="userDeleteModal">
-                                                    Open Delete Form
-                                                </button>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Open modal to delete a user</small>
-                                                </div>
-                                            </div>
+                            <!-- Delete User -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-danger text-white py-2">
+                                        <h6 class="mb-0">Delete User <span
+                                                class="endpoint-badge badge method-delete">DELETE</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                            data-modal="userDeleteModal">
+                                            Open Delete Form
+                                        </button>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Open modal to delete a user</small>
                                         </div>
                                     </div>
                                 </div>
@@ -1077,89 +882,81 @@
                         <h5 class="mb-0">🪑 Tables Management</h5>
                     </div>
                     <div class="card-body">
-                        <!-- Navigation tabs for tables -->
-                        <ul class="nav nav-tabs mb-3" id="tablesTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tableGroups">Table Groups</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tablesList">Tables</button>
-                            </li>
-                        </ul>
-
-                        <div class="tab-content">
-                            <!-- Table Groups Tab -->
-                            <div class="tab-pane fade show active" id="tableGroups">
-                                <div class="row">
-                                    <div class="col-md-3 mb-3">
-                                        <div class="card">
-                                            <div class="card-header bg-primary text-white py-2">
-                                                <h6 class="mb-0">Add Table Group <span class="badge bg-light text-dark">POST</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn" data-modal="tableGroupAddModal">Add</button>
-                                            </div>
-                                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white py-2">
+                                        <h6 class="mb-0">Add Table Group <span
+                                                class="badge bg-light text-dark">POST</span></h6>
                                     </div>
-
-                                    <div class="col-md-3 mb-3">
-                                        <div class="card">
-                                            <div class="card-header bg-info text-white py-2">
-                                                <h6 class="mb-0">List Table Groups <span class="badge bg-light text-dark">GET</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <button class="api-btn btn btn-info btn-sm w-100" data-endpoint="tables/group/list" data-method="GET">List</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 mb-3">
-                                        <div class="card">
-                                            <div class="card-header bg-warning text-white py-2">
-                                                <h6 class="mb-0">Update Table Group <span class="badge bg-light text-dark">PUT</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <button class="btn btn-warning btn-sm w-100 open-modal-btn" data-modal="tableGroupUpdateModal">Update</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 mb-3">
-                                        <div class="card">
-                                            <div class="card-header bg-danger text-white py-2">
-                                                <h6 class="mb-0">Delete Table Group <span class="badge bg-light text-dark">DELETE</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <button class="btn btn-danger btn-sm w-100 open-modal-btn" data-modal="tableGroupDeleteModal">Delete</button>
-                                            </div>
-                                        </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                            data-modal="tableGroupAddModal">Add</button>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Tables Tab -->
-                            <div class="tab-pane fade" id="tablesList">
-                                <div class="row">
-                                    <div class="col-md-6 offset-md-3 mb-3">
-                                        <div class="card">
-                                            <div class="card-header bg-primary text-white py-2">
-                                                <h6 class="mb-0">Add Table <span class="badge bg-light text-dark">POST</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn" data-modal="tableAddModal">Add</button>
-                                            </div>
-                                        </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white py-2">
+                                        <h6 class="mb-0">List Table Groups <span
+                                                class="badge bg-light text-dark">GET</span></h6>
                                     </div>
+                                    <div class="card-body">
+                                        <button class="api-btn btn btn-info btn-sm w-100"
+                                            data-endpoint="tables/group/list" data-method="GET">List</button>
+                                    </div>
+                                </div>
+                            </div>
 
-                                    <div class="col-md-6 offset-md-3 mb-3">
-                                        <div class="card">
-                                            <div class="card-header bg-info text-white py-2">
-                                                <h6 class="mb-0">List Tables <span class="badge bg-light text-dark">GET</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <button class="api-btn btn btn-info btn-sm w-100" data-endpoint="tables/list" data-method="GET">List</button>
-                                            </div>
-                                        </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-warning text-white py-2">
+                                        <h6 class="mb-0">Update Table Group <span
+                                                class="badge bg-light text-dark">PUT</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                            data-modal="tableGroupUpdateModal">Update</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-danger text-white py-2">
+                                        <h6 class="mb-0">Delete Table Group <span
+                                                class="badge bg-light text-dark">DELETE</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                            data-modal="tableGroupDeleteModal">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white py-2">
+                                        <h6 class="mb-0">Add Table <span class="badge bg-light text-dark">POST</span>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                            data-modal="tableAddModal">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white py-2">
+                                        <h6 class="mb-0">List Tables <span class="badge bg-light text-dark">GET</span>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="api-btn btn btn-info btn-sm w-100" data-endpoint="tables/list"
+                                            data-method="GET">List</button>
                                     </div>
                                 </div>
                             </div>
@@ -1416,44 +1213,36 @@
                         <h5 class="mb-0">💳 Payments</h5>
                     </div>
                     <div class="card-body">
-                        <!-- Tab Navigation -->
-                        <ul class="nav nav-tabs mb-3" id="paymentsTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="addPayment-tab" data-bs-toggle="tab" data-bs-target="#addPayment" type="button" role="tab" aria-controls="addPayment" aria-selected="true">Add Payment</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="checkPayment-tab" data-bs-toggle="tab" data-bs-target="#checkPayment" type="button" role="tab" aria-controls="checkPayment" aria-selected="false">Check Payment Status</button>
-                            </li>
-                        </ul>
-
-                        <!-- Tab Content -->
-                        <div class="tab-content" id="paymentsTabContent">
-                            <!-- Add Payment Tab -->
-                            <div class="tab-pane fade show active" id="addPayment" role="tabpanel" aria-labelledby="addPayment-tab">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
                                 <div class="card">
                                     <div class="card-header bg-primary text-white py-2">
-                                        <h6 class="mb-0">Add Payment <span class="badge bg-light text-dark">POST</span></h6>
+                                        <h6 class="mb-0">Add Payment <span class="badge bg-light text-dark">POST</span>
+                                        </h6>
                                     </div>
                                     <div class="card-body">
-                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn" data-modal="paymentAddModal">Add</button>
+                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                            data-modal="paymentAddModal">Add</button>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Check Payment Status Tab -->
-                            <div class="tab-pane fade" id="checkPayment" role="tabpanel" aria-labelledby="checkPayment-tab">
+                            <div class="col-md-6 mb-4">
                                 <div class="card">
                                     <div class="card-header bg-info text-white py-2">
-                                        <h6 class="mb-0">Check Payment Status <span class="badge bg-light text-dark">GET</span></h6>
+                                        <h6 class="mb-0">Check Payment Status <span
+                                                class="badge bg-light text-dark">GET</span></h6>
                                     </div>
                                     <div class="card-body">
                                         <form class="api-form" data-endpoint="payments/status" data-method="GET">
                                             <div class="mb-2">
-                                                <select name="order_id" class="form-select form-select-sm" required>
+                                                <select name="order_id"
+                                                    class="form-select form-select-sm" required>
                                                     <option value="">Select Order</option>
                                                 </select>
                                             </div>
-                                            <button type="submit" class="btn btn-info btn-sm w-100">Check Status</button>
+                                            <button type="submit" class="btn btn-info btn-sm w-100">Check
+                                                Status</button>
                                         </form>
                                     </div>
                                 </div>
@@ -1467,246 +1256,244 @@
                     <div class="card-header">
                         <h5 class="mb-0">📊 Reports</h5>
                     </div>
-                    <div class="card-body">
-                        <ul class="nav nav-tabs mb-3" id="reportsTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#salesReport">Sales</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#inventoryReport">Inventory</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#stockMovement">Stock Movement</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#orderReport">Orders</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#paymentReport">Payments</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#userActivity">User Activity</button>
-                            </li>
-                        </ul>
+            <div class="card-body">
+                <ul class="nav nav-tabs mb-3" id="reportsTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#salesReport">Sales</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#inventoryReport">Inventory</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#stockMovement">Stock Movement</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#orderReport">Orders</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#paymentReport">Payments</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#userActivity">User Activity</button>
+                    </li>
+                </ul>
 
-                        <div class="tab-content">
-                            <!-- Sales Report -->
-                            <div class="tab-pane fade show active" id="salesReport">
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card">
-                                            <div class="card-header bg-success text-white py-2">
-                                                <h6 class="mb-0">Sales Report <span class="badge bg-light text-dark">GET</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <form class="api-form" data-endpoint="reports/sales" data-method="GET">
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">Start Date (Optional)</label>
-                                                        <input type="date" name="start_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">End Date (Optional)</label>
-                                                        <input type="date" name="end_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">Menu ID (Optional)</label>
-                                                        <input type="number" name="menu_id" class="form-control form-control-sm" placeholder="Filter by menu">
-                                                    </div>
-                                                    <button type="submit" class="btn btn-success btn-sm w-100">Generate Sales Report</button>
-                                                </form>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Shows all sales data if no dates provided</small>
-                                                </div>
-                                            </div>
-                                        </div>
+                <div class="tab-content">
+                    <!-- Sales Report -->
+                    <div class="tab-pane fade show active" id="salesReport">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-success text-white py-2">
+                                        <h6 class="mb-0">Sales Report <span class="badge bg-light text-dark">GET</span></h6>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Inventory Report -->
-                            <div class="tab-pane fade" id="inventoryReport">
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card">
-                                            <div class="card-header bg-warning text-white py-2">
-                                                <h6 class="mb-0">Inventory Report <span class="badge bg-light text-dark">GET</span></h6>
+                                    <div class="card-body">
+                                        <form class="api-form" data-endpoint="reports/sales" data-method="GET">
+                                            <div class="mb-2">
+                                                <label class="form-label small">Start Date (Optional)</label>
+                                                <input type="date" name="start_date" class="form-control form-control-sm">
                                             </div>
-                                            <div class="card-body">
-                                                <form class="api-form" data-endpoint="reports/inventory" data-method="GET">
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">Start Date (Optional)</label>
-                                                        <input type="date" name="start_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">End Date (Optional)</label>
-                                                        <input type="date" name="end_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <button type="submit" class="btn btn-warning btn-sm w-100">Generate Inventory Report</button>
-                                                </form>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Shows current stock levels and alerts. Filter by creation date if dates provided.</small>
-                                                </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small">End Date (Optional)</label>
+                                                <input type="date" name="end_date" class="form-control form-control-sm">
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Stock Movement Report -->
-                            <div class="tab-pane fade" id="stockMovement">
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card">
-                                            <div class="card-header bg-info text-white py-2">
-                                                <h6 class="mb-0">Stock Movement Report <span class="badge bg-light text-dark">GET</span></h6>
+                                            <div class="mb-2">
+                                                <label class="form-label small">Menu ID (Optional)</label>
+                                                <input type="number" name="menu_id" class="form-control form-control-sm" placeholder="Filter by menu">
                                             </div>
-                                            <div class="card-body">
-                                                <form class="api-form" data-endpoint="reports/stock-movement" data-method="GET">
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">Start Date (Optional)</label>
-                                                        <input type="date" name="start_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">End Date (Optional)</label>
-                                                        <input type="date" name="end_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">Stock ID (Optional)</label>
-                                                        <input type="number" name="stock_id" class="form-control form-control-sm" placeholder="Filter by stock">
-                                                    </div>
-                                                    <button type="submit" class="btn btn-info btn-sm w-100">Generate Stock Movement Report</button>
-                                                </form>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Shows all stock transactions if no dates provided</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Order Report -->
-                            <div class="tab-pane fade" id="orderReport">
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card">
-                                            <div class="card-header bg-primary text-white py-2">
-                                                <h6 class="mb-0">Order Report <span class="badge bg-light text-dark">GET</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <form class="api-form" data-endpoint="reports/orders" data-method="GET">
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">Start Date (Optional)</label>
-                                                        <input type="date" name="start_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">End Date (Optional)</label>
-                                                        <input type="date" name="end_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">Status (Optional)</label>
-                                                        <select name="status" class="form-select form-select-sm">
-                                                            <option value="">All Statuses</option>
-                                                            <option value="pending">Pending</option>
-                                                            <option value="confirmed">Confirmed</option>
-                                                            <option value="preparing">Preparing</option>
-                                                            <option value="ready">Ready</option>
-                                                            <option value="completed">Completed</option>
-                                                            <option value="cancelled">Cancelled</option>
-                                                        </select>
-                                                    </div>
-                                                    <button type="submit" class="btn btn-primary btn-sm w-100">Generate Order Report</button>
-                                                </form>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Shows all orders if no dates provided</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Payment Report -->
-                            <div class="tab-pane fade" id="paymentReport">
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card">
-                                            <div class="card-header bg-success text-white py-2">
-                                                <h6 class="mb-0">Payment Report <span class="badge bg-light text-dark">GET</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <form class="api-form" data-endpoint="reports/payments" data-method="GET">
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">Start Date (Optional)</label>
-                                                        <input type="date" name="start_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">End Date (Optional)</label>
-                                                        <input type="date" name="end_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <button type="submit" class="btn btn-success btn-sm w-100">Generate Payment Report</button>
-                                                </form>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Shows all payments if no dates provided</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- User Activity Report -->
-                            <div class="tab-pane fade" id="userActivity">
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card">
-                                            <div class="card-header bg-secondary text-white py-2">
-                                                <h6 class="mb-0">User Activity Report <span class="badge bg-light text-dark">GET</span></h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <form class="api-form" data-endpoint="reports/user-activity" data-method="GET">
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">Start Date (Optional)</label>
-                                                        <input type="date" name="start_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <label class="form-label small">End Date (Optional)</label>
-                                                        <input type="date" name="end_date" class="form-control form-control-sm">
-                                                    </div>
-                                                    <button type="submit" class="btn btn-secondary btn-sm w-100">Generate User Activity Report</button>
-                                                </form>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Shows all user statistics if no dates provided</small>
-                                                </div>
-                                            </div>
+                                            <button type="submit" class="btn btn-success btn-sm w-100">Generate Sales Report</button>
+                                        </form>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Shows all sales data if no dates provided</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </section>
 
-                <!-- Response Display Area -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-dark text-white">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0">📄 API Responses</h6>
-                                    <button class="btn btn-sm btn-outline-light" onclick="clearResponse()">Clear</button>
+                    <!-- Inventory Report -->
+                    <div class="tab-pane fade" id="inventoryReport">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-warning text-white py-2">
+                                        <h6 class="mb-0">Inventory Report <span class="badge bg-light text-dark">GET</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form class="api-form" data-endpoint="reports/inventory" data-method="GET">
+                                            <div class="mb-2">
+                                                <label class="form-label small">Start Date (Optional)</label>
+                                                <input type="date" name="start_date" class="form-control form-control-sm">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small">End Date (Optional)</label>
+                                                <input type="date" name="end_date" class="form-control form-control-sm">
+                                            </div>
+                                            <button type="submit" class="btn btn-warning btn-sm w-100">Generate Inventory Report</button>
+                                        </form>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Shows current stock levels and alerts. Filter by creation date if dates provided.</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <div id="response" style="max-height: 500px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Stock Movement Report -->
+                    <div class="tab-pane fade" id="stockMovement">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white py-2">
+                                        <h6 class="mb-0">Stock Movement Report <span class="badge bg-light text-dark">GET</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form class="api-form" data-endpoint="reports/stock-movement" data-method="GET">
+                                            <div class="mb-2">
+                                                <label class="form-label small">Start Date (Optional)</label>
+                                                <input type="date" name="start_date" class="form-control form-control-sm">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small">End Date (Optional)</label>
+                                                <input type="date" name="end_date" class="form-control form-control-sm">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small">Stock ID (Optional)</label>
+                                                <input type="number" name="stock_id" class="form-control form-control-sm" placeholder="Filter by stock">
+                                            </div>
+                                            <button type="submit" class="btn btn-info btn-sm w-100">Generate Stock Movement Report</button>
+                                        </form>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Shows all stock transactions if no dates provided</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Report -->
+                    <div class="tab-pane fade" id="orderReport">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white py-2">
+                                        <h6 class="mb-0">Order Report <span class="badge bg-light text-dark">GET</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form class="api-form" data-endpoint="reports/orders" data-method="GET">
+                                            <div class="mb-2">
+                                                <label class="form-label small">Start Date (Optional)</label>
+                                                <input type="date" name="start_date" class="form-control form-control-sm">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small">End Date (Optional)</label>
+                                                <input type="date" name="end_date" class="form-control form-control-sm">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small">Status (Optional)</label>
+                                                <select name="status" class="form-select form-select-sm">
+                                                    <option value="">All Statuses</option>
+                                                    <option value="pending">Pending</option>
+                                                    <option value="confirmed">Confirmed</option>
+                                                    <option value="preparing">Preparing</option>
+                                                    <option value="ready">Ready</option>
+                                                    <option value="completed">Completed</option>
+                                                    <option value="cancelled">Cancelled</option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-sm w-100">Generate Order Report</button>
+                                        </form>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Shows all orders if no dates provided</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Report -->
+                    <div class="tab-pane fade" id="paymentReport">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-success text-white py-2">
+                                        <h6 class="mb-0">Payment Report <span class="badge bg-light text-dark">GET</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form class="api-form" data-endpoint="reports/payments" data-method="GET">
+                                            <div class="mb-2">
+                                                <label class="form-label small">Start Date (Optional)</label>
+                                                <input type="date" name="start_date" class="form-control form-control-sm">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small">End Date (Optional)</label>
+                                                <input type="date" name="end_date" class="form-control form-control-sm">
+                                            </div>
+                                            <button type="submit" class="btn btn-success btn-sm w-100">Generate Payment Report</button>
+                                        </form>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Shows all payments if no dates provided</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Activity Report -->
+                    <div class="tab-pane fade" id="userActivity">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-secondary text-white py-2">
+                                        <h6 class="mb-0">User Activity Report <span class="badge bg-light text-dark">GET</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form class="api-form" data-endpoint="reports/user-activity" data-method="GET">
+                                            <div class="mb-2">
+                                                <label class="form-label small">Start Date (Optional)</label>
+                                                <input type="date" name="start_date" class="form-control form-control-sm">
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small">End Date (Optional)</label>
+                                                <input type="date" name="end_date" class="form-control form-control-sm">
+                                            </div>
+                                            <button type="submit" class="btn btn-secondary btn-sm w-100">Generate User Activity Report</button>
+                                        </form>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Shows all user statistics if no dates provided</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Include all the modals from your original code here -->
+        <!-- Response Display Area -->
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">📄 API Responses</h6>
+                            <button class="btn btn-sm btn-outline-light" onclick="clearResponse()">Clear</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="response" style="max-height: 500px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
         <!-- ... (keep all your modal code) ... -->
 
     </div>
@@ -2813,7 +2600,7 @@
         </p>
     </footer>
 
-    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/api.js"></script>
     <script>
         // Initialize API client
@@ -3399,73 +3186,23 @@
                 failed === 0 ? 'success' : 'warning');
         }
 
-        // Function to show specific tab in a section
-        function showTab(tabGroupId, tabId, clickedElement) {
-            // Hide all sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-
-            // Show target section (extract section id from tab group id)
-            const sectionId = tabGroupId.replace('Tab', '').toLowerCase();
-            const targetSection = document.getElementById(sectionId);
-            if (targetSection) {
-                targetSection.classList.add('active');
-            }
-
-            // Update active nav link - remove active from all
-            document.querySelectorAll('.nav-link').forEach(navLink => {
-                navLink.classList.remove('active');
-            });
-
-            // If clicked element is provided, find its parent collapsible header and highlight it
-            if (clickedElement) {
-                // Find the parent collapse element and then its trigger
-                const collapseElement = clickedElement.closest('.collapse');
-                if (collapseElement) {
-                    const collapseId = collapseElement.id;
-                    const trigger = document.querySelector(`[data-bs-target="#${collapseId}"]`);
-                    if (trigger) {
-                        trigger.classList.add('active');
-                    }
-                }
-            }
-
-            // Activate the specific tab using Bootstrap's tab system
-            const tabTrigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
-            if (tabTrigger) {
-                const tab = new bootstrap.Tab(tabTrigger);
-                tab.show();
-            }
-        }
-
         // Sidebar navigation - show/hide sections
         document.querySelectorAll('.nav-link[href^="#"]').forEach(link => {
             link.addEventListener('click', function (e) {
                 e.preventDefault();
                 const targetId = this.getAttribute('href').substring(1); // Remove #
-
+                
                 // Hide all sections
                 document.querySelectorAll('.content-section').forEach(section => {
                     section.classList.remove('active');
                 });
-
+                
                 // Show target section
                 const targetSection = document.getElementById(targetId);
                 if (targetSection) {
                     targetSection.classList.add('active');
-
-                    // If this section has tabs, show the first tab by default
-                    const tabList = targetSection.querySelector('.nav-tabs');
-                    if (tabList) {
-                        const firstTab = tabList.querySelector('[data-bs-toggle="tab"]');
-                        if (firstTab) {
-                            const tab = new bootstrap.Tab(firstTab);
-                            tab.show();
-                        }
-                    }
                 }
-
+                
                 // Update active link
                 document.querySelectorAll('.nav-link').forEach(navLink => {
                     navLink.classList.remove('active');
