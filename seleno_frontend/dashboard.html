@@ -99,22 +99,22 @@
                                 <div class="collapse" id="userSubmenu">
                                     <ul class="nav flex-column ms-3">
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'addUser')">
+                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'addUser', this)">
                                                 ➕ Add User
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'listUsers')">
+                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'listUsers', this)">
                                                 📋 List Users
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'updateUser')">
+                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'updateUser', this)">
                                                 ✏️ Update User
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'deleteUser')">
+                                            <a class="nav-link" href="#" onclick="event.preventDefault(); showTab('usersTab', 'deleteUser', this)">
                                                 🗑️ Delete User
                                             </a>
                                         </li>
@@ -3398,7 +3398,7 @@
             showMessage(`Test completed: ${success} passed, ${failed} failed`,
                 failed === 0 ? 'success' : 'warning');
         // Function to show specific tab in a section
-        function showTab(tabGroupId, tabId) {
+        function showTab(tabGroupId, tabId, clickedElement) {
             // Hide all sections
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
@@ -3411,10 +3411,23 @@
                 targetSection.classList.add('active');
             }
 
-            // Update active nav link
+            // Update active nav link - remove active from all
             document.querySelectorAll('.nav-link').forEach(navLink => {
                 navLink.classList.remove('active');
             });
+
+            // If clicked element is provided, find its parent collapsible header and highlight it
+            if (clickedElement) {
+                // Find the parent collapse element and then its trigger
+                const collapseElement = clickedElement.closest('.collapse');
+                if (collapseElement) {
+                    const collapseId = collapseElement.id;
+                    const trigger = document.querySelector(`[data-bs-target="#${collapseId}"]`);
+                    if (trigger) {
+                        trigger.classList.add('active');
+                    }
+                }
+            }
 
             // Activate the specific tab using Bootstrap's tab system
             const tabTrigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
@@ -3429,18 +3442,28 @@
             link.addEventListener('click', function (e) {
                 e.preventDefault();
                 const targetId = this.getAttribute('href').substring(1); // Remove #
-                
+
                 // Hide all sections
                 document.querySelectorAll('.content-section').forEach(section => {
                     section.classList.remove('active');
                 });
-                
+
                 // Show target section
                 const targetSection = document.getElementById(targetId);
                 if (targetSection) {
                     targetSection.classList.add('active');
+
+                    // If this section has tabs, show the first tab by default
+                    const tabList = targetSection.querySelector('.nav-tabs');
+                    if (tabList) {
+                        const firstTab = tabList.querySelector('[data-bs-toggle="tab"]');
+                        if (firstTab) {
+                            const tab = new bootstrap.Tab(firstTab);
+                            tab.show();
+                        }
+                    }
                 }
-                
+
                 // Update active link
                 document.querySelectorAll('.nav-link').forEach(navLink => {
                     navLink.classList.remove('active');
