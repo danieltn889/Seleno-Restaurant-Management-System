@@ -1,0 +1,96 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1, h2, h3 {
+    color: #333;
+}
+
+.login-form {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#logoutBtn {
+    background-color: #f44336;
+    margin-bottom: 20px;
+}
+
+#logoutBtn:hover {
+    background-color: #da190b;
+}
+
+.api-section {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.api-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.api-form input, .api-form select {
+    flex: 1;
+    min-width: 150px;
+}
+
+.api-btn {
+    margin-top: 10px;
+}
+
+#response {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#response pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+#message {
+    margin-top: 10px;
+    color: red;
+}

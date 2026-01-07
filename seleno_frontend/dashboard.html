@@ -1,0 +1,3240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleno Restaurant - API Tester</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .section-card {
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+
+        .section-card .card-header {
+            background: #f8f9fa;
+            color: #2c3e50;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .endpoint-badge {
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+
+        .method-get {
+            background-color: #61affe;
+        }
+
+        .method-post {
+            background-color: #49cc90;
+        }
+
+        .method-put {
+            background-color: #fca130;
+        }
+
+        .method-delete {
+            background-color: #f93e3e;
+        }
+
+        .form-control-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .nav-link {
+            color: #666;
+        }
+
+        .nav-link.active {
+            color: #3498db;
+            font-weight: 600;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <strong>🍽️ Seleno API Tester</strong>
+                </a>
+                <div class="d-flex align-items-center">
+                    <span class="text-white me-3" id="userInfo"></span>
+                    <button id="logoutBtn" class="btn btn-outline-light btn-sm">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2">
+                <div class="card sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">📋 Navigation</h6>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#users">
+                                    👥 User Management
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#inventory">
+                                    📦 Inventory Management
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#menu">
+                                    🍽️ Menu Management
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#tables">
+                                    🪑 Tables Management
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#orders">
+                                    📋 Orders Management
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#payments">
+                                    💳 Payments
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#reports">
+                                    📊 Reports
+                                </a>
+                            </li>
+                        </ul>
+
+                        <hr class="my-3">
+
+                        <div class="mb-3">
+                            <h6 class="small text-muted mb-2">Quick Actions</h6>
+                            <button class="btn btn-sm btn-outline-primary w-100 mb-2" onclick="testAllEndpoints()">
+                                🧪 Test All Endpoints
+                            </button>
+                            <button class="btn btn-sm btn-outline-success w-100 mb-2" onclick="clearResponse()">
+                                🧹 Clear Response
+                            </button>
+                            <button class="btn btn-sm btn-outline-info w-100" onclick="exportResults()">
+                                📊 Export Results
+                            </button>
+                        </div>
+
+                        <div class="mt-3">
+                            <h6 class="small text-muted mb-2">Test Status</h6>
+                            <div class="progress mb-2">
+                                <div id="testProgress" class="progress-bar" style="width: 0%"></div>
+                            </div>
+                            <div id="testStatus" class="small"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div id="message" class="alert alert-info alert-dismissible fade show" style="display:none;">
+                    <span id="messageText"></span>
+                    <button type="button" class="btn-close" onclick="hideMessage()"></button>
+                </div>
+
+                <!-- User Management Section -->
+                <section id="users" class="section-card card content-section">
+                    <div class="card-header">
+                        <h5 class="mb-0">👥 User Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Add User -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-primary text-white py-2">
+                                        <h6 class="mb-0">Add User <span
+                                                class="endpoint-badge badge method-post">POST</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                            data-modal="userAddModal">
+                                            Open Add Form
+                                        </button>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Open modal to add a new user</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- List Users -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-info text-white py-2">
+                                        <h6 class="mb-0">List Users <span
+                                                class="endpoint-badge badge method-get">GET</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="api-btn btn btn-info btn-sm w-100" data-endpoint="users/list"
+                                            data-method="GET">
+                                            List All Users
+                                        </button>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Returns all users in the system</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Update User -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-warning text-white py-2">
+                                        <h6 class="mb-0">Update User <span
+                                                class="endpoint-badge badge method-put">PUT</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                            data-modal="userUpdateModal">
+                                            Open Update Form
+                                        </button>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Open modal to update user details</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Delete User -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-danger text-white py-2">
+                                        <h6 class="mb-0">Delete User <span
+                                                class="endpoint-badge badge method-delete">DELETE</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                            data-modal="userDeleteModal">
+                                            Open Delete Form
+                                        </button>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Open modal to delete a user</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Inventory Management Section -->
+                <section id="inventory" class="section-card card content-section">
+                    <div class="card-header">
+                        <h5 class="mb-0">📦 Inventory Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Navigation tabs for inventory -->
+                        <ul class="nav nav-tabs mb-3" id="inventoryTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" data-bs-toggle="tab"
+                                    data-bs-target="#stockCategories">Categories</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab"
+                                    data-bs-target="#stockGroups">Groups</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab"
+                                    data-bs-target="#stockItems">Items</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab"
+                                    data-bs-target="#stockTransactions">Transactions</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- Stock Categories Tab -->
+                            <div class="tab-pane fade show active" id="stockCategories">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Add Category <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                                    data-modal="stockCategoryAddModal">
+                                                    Open Add Form
+                                                </button>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Open modal to add category</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white py-2">
+                                                <h6 class="mb-0">List Categories <span
+                                                        class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="api-btn btn btn-info btn-sm w-100"
+                                                    data-endpoint="inventory/stock-category/list"
+                                                    data-method="GET">List</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-warning text-white py-2">
+                                                <h6 class="mb-0">Update Category <span
+                                                        class="badge bg-light text-dark">PUT</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                                    data-modal="stockCategoryUpdateModal">Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-danger text-white py-2">
+                                                <h6 class="mb-0">Delete Category <span
+                                                        class="badge bg-light text-dark">DELETE</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                                    data-modal="stockCategoryDeleteModal">
+                                                    Open Delete Form
+                                                </button>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Open modal to delete category</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stock Groups Tab -->
+                            <div class="tab-pane fade" id="stockGroups">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Add Group <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                                    data-modal="stockGroupAddModal">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white py-2">
+                                                <h6 class="mb-0">List Groups <span
+                                                        class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="api-btn btn btn-info btn-sm w-100"
+                                                    data-endpoint="inventory/stock-group/list"
+                                                    data-method="GET">List</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-warning text-white py-2">
+                                                <h6 class="mb-0">Update Group <span
+                                                        class="badge bg-light text-dark">PUT</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                                    data-modal="stockGroupUpdateModal">Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-danger text-white py-2">
+                                                <h6 class="mb-0">Delete Group <span
+                                                        class="badge bg-light text-dark">DELETE</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="inventory/stock-group/delete"
+                                                    data-method="DELETE">
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">Select Group to Delete</label>
+                                                        <select name="group_id" class="form-select form-select-sm" required>
+                                                            <option value="">Select a group</option>
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit"
+                                                        class="btn btn-danger btn-sm w-100">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stock Items Tab -->
+                            <div class="tab-pane fade" id="stockItems">
+                                <div class="row">
+                                    <!-- Stock Item Categories -->
+                                    <div class="col-12 mb-4">
+                                        <h6>Stock Item Categories</h6>
+                                        <div class="row">
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card">
+                                                    <div class="card-header bg-primary text-white py-2">
+                                                        <h6 class="mb-0">Add Item Category <span
+                                                                class="badge bg-light text-dark">POST</span></h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                                            data-modal="stockItemCategoryAddModal">Add</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card">
+                                                    <div class="card-header bg-info text-white py-2">
+                                                        <h6 class="mb-0">List Item Categories <span
+                                                                class="badge bg-light text-dark">GET</span></h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <button class="api-btn btn btn-info btn-sm w-100"
+                                                            data-endpoint="inventory/stock-item-category/list"
+                                                            data-method="GET">List</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card">
+                                                    <div class="card-header bg-warning text-white py-2">
+                                                        <h6 class="mb-0">Update Item Category <span
+                                                                class="badge bg-light text-dark">PUT</span></h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                                            data-modal="stockItemCategoryUpdateModal">Update</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card">
+                                                    <div class="card-header bg-danger text-white py-2">
+                                                        <h6 class="mb-0">Delete Item Category <span
+                                                                class="badge bg-light text-dark">DELETE</span></h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <form class="api-form"
+                                                            data-endpoint="inventory/stock-item-category/delete"
+                                                            data-method="DELETE">
+                                                            <div class="mb-2">
+                                                                <label class="form-label small">Select Item Category to Delete</label>
+                                                                <select name="id" class="form-select form-select-sm" required>
+                                                                    <option value="">Select an item category</option>
+                                                                </select>
+                                                            </div>
+                                                            <button type="submit"
+                                                                class="btn btn-danger btn-sm w-100">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Stocks -->
+                                    <div class="col-12">
+                                        <h6>Stocks</h6>
+                                        <div class="row">
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card">
+                                                    <div class="card-header bg-primary text-white py-2">
+                                                        <h6 class="mb-0">Add Stock <span
+                                                                class="badge bg-light text-dark">POST</span></h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                                            data-modal="stockAddModal">Add</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card">
+                                                    <div class="card-header bg-info text-white py-2">
+                                                        <h6 class="mb-0">List Stocks <span
+                                                                class="badge bg-light text-dark">GET</span></h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <button class="api-btn btn btn-info btn-sm w-100"
+                                                            data-endpoint="inventory/stocks/list"
+                                                            data-method="GET">List</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card">
+                                                    <div class="card-header bg-warning text-white py-2">
+                                                        <h6 class="mb-0">Update Stock <span
+                                                                class="badge bg-light text-dark">PUT</span></h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                                            data-modal="stockUpdateModal">Update</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card">
+                                                    <div class="card-header bg-danger text-white py-2">
+                                                        <h6 class="mb-0">Delete Stock <span
+                                                                class="badge bg-light text-dark">DELETE</span></h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <form class="api-form" data-endpoint="inventory/stocks/delete"
+                                                            data-method="DELETE">
+                                                            <div class="mb-2">
+                                                                <label class="form-label small">Select Stock to Delete</label>
+                                                                <select name="stock_id" class="form-select form-select-sm" required>
+                                                                    <option value="">Select a stock</option>
+                                                                </select>
+                                                            </div>
+                                                            <button type="submit"
+                                                                class="btn btn-danger btn-sm w-100">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stock Transactions Tab -->
+                            <div class="tab-pane fade" id="stockTransactions">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-success text-white py-2">
+                                                <h6 class="mb-0">Stock IN <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="inventory/stockin/add"
+                                                    data-method="POST">
+                                                    <div class="mb-2">
+                                                        <select name="stock_id"
+                                                            class="form-select form-select-sm" required>
+                                                            <option value="">Select Stock</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <input type="number" name="stockin_qty"
+                                                            class="form-control form-control-sm" placeholder="Quantity"
+                                                            required>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <input type="number" name="stockin_price_init"
+                                                            class="form-control form-control-sm"
+                                                            placeholder="Initial Price" required>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <select name="userid"
+                                                            class="form-select form-select-sm" required>
+                                                            <option value="">Select User</option>
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-success btn-sm w-100">Add Stock
+                                                        IN</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-danger text-white py-2">
+                                                <h6 class="mb-0">Stock OUT <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="inventory/stockout/add"
+                                                    data-method="POST">
+                                                    <div class="mb-2">
+                                                        <select name="stock_id"
+                                                            class="form-select form-select-sm" required>
+                                                            <option value="">Select Stock</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <input type="number" name="stockout_qty"
+                                                            class="form-control form-control-sm" placeholder="Quantity"
+                                                            required>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <select name="userid"
+                                                            class="form-select form-select-sm" required>
+                                                            <option value="">Select User</option>
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-danger btn-sm w-100">Add Stock
+                                                        OUT</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Menu Management Section -->
+                <section id="menu" class="section-card card content-section">
+                    <div class="card-header">
+                        <h5 class="mb-0">🍽️ Menu Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs mb-3" id="menuTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" data-bs-toggle="tab"
+                                    data-bs-target="#menuGroups">Category Groups</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab"
+                                    data-bs-target="#menuCategories">Categories</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#menus">Menus</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#menuItems">Menu
+                                    Items</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- Menu Category Groups -->
+                            <div class="tab-pane fade show active" id="menuGroups">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Add Group <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                                    data-modal="menuCategoryGroupAddModal">
+                                                    Open Add Form
+                                                </button>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Open modal to add group</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white py-2">
+                                                <h6 class="mb-0">List Groups <span
+                                                        class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="api-btn btn btn-info btn-sm w-100"
+                                                    data-endpoint="menu/category-group/list"
+                                                    data-method="GET">List</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-warning text-white py-2">
+                                                <h6 class="mb-0">Update Group <span
+                                                        class="badge bg-light text-dark">PUT</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                                    data-modal="menuCategoryGroupUpdateModal">Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-danger text-white py-2">
+                                                <h6 class="mb-0">Delete Group <span
+                                                        class="badge bg-light text-dark">DELETE</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                                    data-modal="menuCategoryGroupDeleteModal">
+                                                    Open Delete Form
+                                                </button>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Open modal to delete group</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Menu Categories -->
+                            <div class="tab-pane fade" id="menuCategories">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Add Category <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                                    data-modal="menuCategoryAddModal">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white py-2">
+                                                <h6 class="mb-0">List Categories <span
+                                                        class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="api-btn btn btn-info btn-sm w-100"
+                                                    data-endpoint="menu/category/list" data-method="GET">List</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-warning text-white py-2">
+                                                <h6 class="mb-0">Update Category <span
+                                                        class="badge bg-light text-dark">PUT</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                                    data-modal="menuCategoryUpdateModal">Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-danger text-white py-2">
+                                                <h6 class="mb-0">Delete Category <span
+                                                        class="badge bg-light text-dark">DELETE</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                                    data-modal="menuCategoryDeleteModal">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Menus -->
+                            <div class="tab-pane fade" id="menus">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Add Menu <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                                    data-modal="menuAddModal">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white py-2">
+                                                <h6 class="mb-0">List Menus <span
+                                                        class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="api-btn btn btn-info btn-sm w-100"
+                                                    data-endpoint="menu/list" data-method="GET">List</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-warning text-white py-2">
+                                                <h6 class="mb-0">Update Menu <span
+                                                        class="badge bg-light text-dark">PUT</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                                    data-modal="menuUpdateModal">Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-danger text-white py-2">
+                                                <h6 class="mb-0">Delete Menu <span
+                                                        class="badge bg-light text-dark">DELETE</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                                    data-modal="menuDeleteModal">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Menu Items -->
+                            <div class="tab-pane fade" id="menuItems">
+                                <div class="row">
+                                    <div class="col-md-6 offset-md-3">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Add Menu Item <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="menu/items/add"
+                                                    data-method="POST">
+                                                    <div class="mb-2">
+                                                        <input type="number" name="menu_id"
+                                                            class="form-control form-control-sm" placeholder="Menu ID"
+                                                            required>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <input type="number" name="stock_id"
+                                                            class="form-control form-control-sm" placeholder="Stock ID"
+                                                            required>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <input type="text" name="menu_item_name"
+                                                            class="form-control form-control-sm" placeholder="Item Name"
+                                                            required>
+                                                    </div>
+                                                    <button type="submit"
+                                                        class="btn btn-primary btn-sm w-100">Add</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tables Management Section -->
+                <section id="tables" class="section-card card content-section">
+                    <div class="card-header">
+                        <h5 class="mb-0">🪑 Tables Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white py-2">
+                                        <h6 class="mb-0">Add Table Group <span
+                                                class="badge bg-light text-dark">POST</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                            data-modal="tableGroupAddModal">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white py-2">
+                                        <h6 class="mb-0">List Table Groups <span
+                                                class="badge bg-light text-dark">GET</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="api-btn btn btn-info btn-sm w-100"
+                                            data-endpoint="tables/group/list" data-method="GET">List</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-warning text-white py-2">
+                                        <h6 class="mb-0">Update Table Group <span
+                                                class="badge bg-light text-dark">PUT</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                            data-modal="tableGroupUpdateModal">Update</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-danger text-white py-2">
+                                        <h6 class="mb-0">Delete Table Group <span
+                                                class="badge bg-light text-dark">DELETE</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                            data-modal="tableGroupDeleteModal">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white py-2">
+                                        <h6 class="mb-0">Add Table <span class="badge bg-light text-dark">POST</span>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                            data-modal="tableAddModal">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white py-2">
+                                        <h6 class="mb-0">List Tables <span class="badge bg-light text-dark">GET</span>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="api-btn btn btn-info btn-sm w-100" data-endpoint="tables/list"
+                                            data-method="GET">List</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Orders Management Section -->
+                <section id="orders" class="section-card card content-section">
+                    <div class="card-header">
+                        <h5 class="mb-0">📋 Orders Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs mb-3" id="ordersTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#orderTypes">Order
+                                    Types</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#specialOrders">Special
+                                    Orders</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab"
+                                    data-bs-target="#orderMain">Orders</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#orderItems">Order
+                                    Items</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- Order Types -->
+                            <div class="tab-pane fade show active" id="orderTypes">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Add Order Type <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                                    data-modal="orderTypeAddModal">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white py-2">
+                                                <h6 class="mb-0">List Order Types <span
+                                                        class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="api-btn btn btn-info btn-sm w-100"
+                                                    data-endpoint="orders/type/list" data-method="GET">List</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-warning text-white py-2">
+                                                <h6 class="mb-0">Update Order Type <span
+                                                        class="badge bg-light text-dark">PUT</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                                    data-modal="orderTypeUpdateModal">Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-danger text-white py-2">
+                                                <h6 class="mb-0">Delete Order Type <span
+                                                        class="badge bg-light text-dark">DELETE</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                                    data-modal="orderTypeDeleteModal">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Special Orders -->
+                            <div class="tab-pane fade" id="specialOrders">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Add Special Order <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                                    data-modal="specialOrderAddModal">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white py-2">
+                                                <h6 class="mb-0">List Special Orders <span
+                                                        class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="api-btn btn btn-info btn-sm w-100"
+                                                    data-endpoint="orders/special/list" data-method="GET">List</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-warning text-white py-2">
+                                                <h6 class="mb-0">Update Special Order <span
+                                                        class="badge bg-light text-dark">PUT</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                                    data-modal="specialOrderUpdateModal">Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-danger text-white py-2">
+                                                <h6 class="mb-0">Delete Special Order <span
+                                                        class="badge bg-light text-dark">DELETE</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                                    data-modal="specialOrderDeleteModal">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Orders -->
+                            <div class="tab-pane fade" id="orderMain">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Create Order <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                                    data-modal="orderCreateModal">Create</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white py-2">
+                                                <h6 class="mb-0">List Orders <span
+                                                        class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="api-btn btn btn-info btn-sm w-100"
+                                                    data-endpoint="orders/list" data-method="GET">List</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-warning text-white py-2">
+                                                <h6 class="mb-0">Update Order Status <span
+                                                        class="badge bg-light text-dark">PUT</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-warning btn-sm w-100 open-modal-btn"
+                                                    data-modal="orderUpdateModal">Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <div class="card-header bg-danger text-white py-2">
+                                                <h6 class="mb-0">Delete Order <span
+                                                        class="badge bg-light text-dark">DELETE</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <button class="btn btn-danger btn-sm w-100 open-modal-btn"
+                                                    data-modal="orderDeleteModal">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Items -->
+                            <div class="tab-pane fade" id="orderItems">
+                                <div class="row">
+                                    <div class="col-md-6 offset-md-3">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Add Order Item <span
+                                                        class="badge bg-light text-dark">POST</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="orders/items/add"
+                                                    data-method="POST">
+                                                    <div class="mb-2">
+                                                        <select name="order_id"
+                                                            class="form-select form-select-sm" required>
+                                                            <option value="">Select Order</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <select name="menu_id"
+                                                            class="form-select form-select-sm" required>
+                                                            <option value="">Select Menu</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <input type="number" name="order_qty"
+                                                            class="form-control form-control-sm" placeholder="Quantity"
+                                                            required>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <input type="number" name="order_item_price"
+                                                            class="form-control form-control-sm" placeholder="Price"
+                                                            required>
+                                                    </div>
+                                                    <button type="submit"
+                                                        class="btn btn-primary btn-sm w-100">Add</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Payments Section -->
+                <section id="payments" class="section-card card content-section">
+                    <div class="card-header">
+                        <h5 class="mb-0">💳 Payments</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white py-2">
+                                        <h6 class="mb-0">Add Payment <span class="badge bg-light text-dark">POST</span>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary btn-sm w-100 open-modal-btn"
+                                            data-modal="paymentAddModal">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white py-2">
+                                        <h6 class="mb-0">Check Payment Status <span
+                                                class="badge bg-light text-dark">GET</span></h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form class="api-form" data-endpoint="payments/status" data-method="GET">
+                                            <div class="mb-2">
+                                                <select name="order_id"
+                                                    class="form-select form-select-sm" required>
+                                                    <option value="">Select Order</option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-info btn-sm w-100">Check
+                                                Status</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports Section -->
+                <section id="reports" class="section-card card content-section">
+                    <div class="card-header">
+                        <h5 class="mb-0">📊 Reports</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs mb-3" id="reportsTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#salesReport">Sales</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#inventoryReport">Inventory</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#stockMovement">Stock Movement</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#orderReport">Orders</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#paymentReport">Payments</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#userActivity">User Activity</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- Sales Report -->
+                            <div class="tab-pane fade show active" id="salesReport">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-success text-white py-2">
+                                                <h6 class="mb-0">Sales Report <span class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="reports/sales" data-method="GET">
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">Start Date (Optional)</label>
+                                                        <input type="date" name="start_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">End Date (Optional)</label>
+                                                        <input type="date" name="end_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">Menu ID (Optional)</label>
+                                                        <input type="number" name="menu_id" class="form-control form-control-sm" placeholder="Filter by menu">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-success btn-sm w-100">Generate Sales Report</button>
+                                                </form>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Shows all sales data if no dates provided</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Inventory Report -->
+                            <div class="tab-pane fade" id="inventoryReport">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-warning text-white py-2">
+                                                <h6 class="mb-0">Inventory Report <span class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="reports/inventory" data-method="GET">
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">Start Date (Optional)</label>
+                                                        <input type="date" name="start_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">End Date (Optional)</label>
+                                                        <input type="date" name="end_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-warning btn-sm w-100">Generate Inventory Report</button>
+                                                </form>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Shows current stock levels and alerts. Filter by creation date if dates provided.</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stock Movement Report -->
+                            <div class="tab-pane fade" id="stockMovement">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white py-2">
+                                                <h6 class="mb-0">Stock Movement Report <span class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="reports/stock-movement" data-method="GET">
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">Start Date (Optional)</label>
+                                                        <input type="date" name="start_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">End Date (Optional)</label>
+                                                        <input type="date" name="end_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">Stock ID (Optional)</label>
+                                                        <input type="number" name="stock_id" class="form-control form-control-sm" placeholder="Filter by stock">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-info btn-sm w-100">Generate Stock Movement Report</button>
+                                                </form>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Shows all stock transactions if no dates provided</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Report -->
+                            <div class="tab-pane fade" id="orderReport">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white py-2">
+                                                <h6 class="mb-0">Order Report <span class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="reports/orders" data-method="GET">
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">Start Date (Optional)</label>
+                                                        <input type="date" name="start_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">End Date (Optional)</label>
+                                                        <input type="date" name="end_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">Status (Optional)</label>
+                                                        <select name="status" class="form-select form-select-sm">
+                                                            <option value="">All Statuses</option>
+                                                            <option value="pending">Pending</option>
+                                                            <option value="confirmed">Confirmed</option>
+                                                            <option value="preparing">Preparing</option>
+                                                            <option value="ready">Ready</option>
+                                                            <option value="completed">Completed</option>
+                                                            <option value="cancelled">Cancelled</option>
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary btn-sm w-100">Generate Order Report</button>
+                                                </form>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Shows all orders if no dates provided</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payment Report -->
+                            <div class="tab-pane fade" id="paymentReport">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-success text-white py-2">
+                                                <h6 class="mb-0">Payment Report <span class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="reports/payments" data-method="GET">
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">Start Date (Optional)</label>
+                                                        <input type="date" name="start_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">End Date (Optional)</label>
+                                                        <input type="date" name="end_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-success btn-sm w-100">Generate Payment Report</button>
+                                                </form>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Shows all payments if no dates provided</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- User Activity Report -->
+                            <div class="tab-pane fade" id="userActivity">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-secondary text-white py-2">
+                                                <h6 class="mb-0">User Activity Report <span class="badge bg-light text-dark">GET</span></h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form class="api-form" data-endpoint="reports/user-activity" data-method="GET">
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">Start Date (Optional)</label>
+                                                        <input type="date" name="start_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">End Date (Optional)</label>
+                                                        <input type="date" name="end_date" class="form-control form-control-sm">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-secondary btn-sm w-100">Generate User Activity Report</button>
+                                                </form>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Shows all user statistics if no dates provided</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Response Display Area -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">📄 API Responses</h6>
+                            <button class="btn btn-sm btn-outline-light" onclick="clearResponse()">Clear</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="response" style="max-height: 500px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Include all the modals from your original code here -->
+        <!-- ... (keep all your modal code) ... -->
+
+    </div>
+
+    <!-- Modals (Keep all your existing modal code here) -->
+    <!-- User Add Modal -->
+    <div class="modal fade" id="userAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="users/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">First Name</label>
+                            <input type="text" name="firstname" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Last Name</label>
+                            <input type="text" name="lastname" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Email</label>
+                            <input type="email" name="email" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Role</label>
+                            <select name="user_role" class="form-select form-select-sm" required>
+                                <option value="Admin">Admin</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Waiter">Waiter</option>
+                                <option value="Chef">Chef</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="user_status" class="form-select form-select-sm" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Phone</label>
+                            <input type="text" name="user_phone" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Password</label>
+                            <input type="password" name="password" class="form-control form-control-sm" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add User</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Delete Modal -->
+    <div class="modal fade" id="userDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="users/delete" data-method="DELETE">
+                        <div class="mb-2">
+                            <label class="form-label small">Select User to Delete</label>
+                            <select name="userid" class="form-select form-select-sm" required>
+                                <option value="">Select a user</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Delete User</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Update Modal -->
+    <div class="modal fade" id="userUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="users/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">User ID</label>
+                            <select name="userid" class="form-select form-select-sm" required>
+                                <option value="">Select User</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">First Name</label>
+                            <input type="text" name="firstname" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Last Name</label>
+                            <input type="text" name="lastname" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Email</label>
+                            <input type="email" name="email" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Role</label>
+                            <select name="user_role" class="form-select form-select-sm">
+                                <option value="Admin">Admin</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Waiter">Waiter</option>
+                                <option value="Chef">Chef</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="user_status" class="form-select form-select-sm">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Phone</label>
+                            <input type="text" name="user_phone" class="form-control form-control-sm">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update User</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Category Add Modal -->
+    <div class="modal fade" id="stockCategoryAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Stock Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="inventory/stock-category/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Category Name</label>
+                            <input type="text" name="stockcat_name" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="stockcat_status" class="form-select form-select-sm" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Category</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Category Delete Modal -->
+    <div class="modal fade" id="stockCategoryDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Stock Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="inventory/stock-category/delete" data-method="DELETE">
+                        <div class="mb-2">
+                            <label class="form-label small">Select Category to Delete</label>
+                            <select name="stockcat_id" class="form-select form-select-sm" required>
+                                <option value="">Select a category</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Delete Category</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include all other modals from your original code -->
+    <!-- Stock Category Update Modal -->
+    <div class="modal fade" id="stockCategoryUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Stock Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="inventory/stock-category/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Category ID</label>
+                            <select name="stockcat_id" class="form-select form-select-sm" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Category Name</label>
+                            <input type="text" name="stockcat_name" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="stockcat_status" class="form-select form-select-sm">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Category</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Category Group Update Modal -->
+    <div class="modal fade" id="menuCategoryGroupUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Menu Category Group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="menu/category-group/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Group ID</label>
+                            <select name="menu_cat_group_id" class="form-select form-select-sm" required>
+                                <option value="">Select Group</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Group Name</label>
+                            <input type="text" name="menu_cat_group_name" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Description</label>
+                            <input type="text" name="menu_cat_group_desc" class="form-control form-control-sm">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Category Group Add Modal -->
+    <div class="modal fade" id="menuCategoryGroupAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Menu Category Group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="menu/category-group/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Group Name</label>
+                            <input type="text" name="menu_cat_group_name" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Description</label>
+                            <input type="text" name="menu_cat_group_desc" class="form-control form-control-sm">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Category Group Delete Modal -->
+    <div class="modal fade" id="menuCategoryGroupDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Menu Category Group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="menu/category-group/delete" data-method="DELETE">
+                        <div class="mb-2">
+                            <label class="form-label small">Group ID</label>
+                            <select name="menu_cat_group_id" class="form-select form-select-sm" required>
+                                <option value="">Select Group</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Delete Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Group Update Modal -->
+    <div class="modal fade" id="tableGroupUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Table Group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="tables/group/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Group ID</label>
+                            <select name="table_group_id" class="form-select form-select-sm" required>
+                                <option value="">Select Group</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Group Name</label>
+                            <input type="text" name="table_group_name" class="form-control form-control-sm">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Category Add Modal -->
+    <div class="modal fade" id="menuCategoryAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Menu Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="menu/category/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Group ID</label>
+                            <select name="menu_cat_group_id" class="form-select form-select-sm" required>
+                                <option value="">Select Group</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Category Name</label>
+                            <input type="text" name="name" class="form-control form-control-sm" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Category</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Category Delete Modal -->
+    <div class="modal fade" id="menuCategoryDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Menu Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="menu/category/delete" data-method="DELETE">
+                        <div class="mb-2">
+                            <label class="form-label small">Category ID</label>
+                            <select name="id" class="form-select form-select-sm" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Delete Category</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Add Modal -->
+    <div class="modal fade" id="menuAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="menu/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Category</label>
+                            <select name="menu_cat_id" class="form-select form-select-sm" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Menu Name</label>
+                            <input type="text" name="menu_name" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Price</label>
+                            <input type="number" name="menu_price" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="menu_status" class="form-select form-select-sm" required>
+                                <option value="available">Available</option>
+                                <option value="unavailable">Unavailable</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Menu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Delete Modal -->
+    <div class="modal fade" id="menuDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="menu/delete" data-method="DELETE">
+                        <div class="mb-2">
+                            <label class="form-label small">Menu ID</label>
+                            <select name="id" class="form-select form-select-sm" required>
+                                <option value="">Select Menu</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Delete Menu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Group Add Modal -->
+    <div class="modal fade" id="tableGroupAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Table Group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="tables/group/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Group Name</label>
+                            <input type="text" name="table_group_name" class="form-control form-control-sm" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Group Delete Modal -->
+    <div class="modal fade" id="tableGroupDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Table Group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="tables/group/delete" data-method="DELETE">
+                        <div class="mb-2">
+                            <label class="form-label small">Group ID</label>
+                            <select name="id" class="form-select form-select-sm" required>
+                                <option value="">Select Group</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Delete Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Add Modal -->
+    <div class="modal fade" id="tableAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Table</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="tables/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Table Group</label>
+                            <select name="table_group_id" class="form-select form-select-sm" required>
+                                <option value="">Select Group</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Description</label>
+                            <input type="text" name="table_desc" class="form-control form-control-sm" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Table</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Type Add Modal -->
+    <div class="modal fade" id="orderTypeAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Order Type</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="orders/type/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Type Name</label>
+                            <input type="text" name="order_type_name" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="order_type_status" class="form-select form-select-sm" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Type</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Type Delete Modal -->
+    <div class="modal fade" id="orderTypeDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Order Type</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="orders/type/delete" data-method="DELETE">
+                        <div class="mb-2">
+                            <label class="form-label small">Type ID</label>
+                            <select name="id" class="form-select form-select-sm" required>
+                                <option value="">Select Type</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Delete Type</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Special Order Add Modal -->
+    <div class="modal fade" id="specialOrderAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Special Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="orders/special/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Name</label>
+                            <input type="text" name="special_order_name" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Description</label>
+                            <input type="text" name="special_order_desc" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Price</label>
+                            <input type="number" name="special_order_price" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="special_order_status" class="form-select form-select-sm" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Special Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Special Order Delete Modal -->
+    <div class="modal fade" id="specialOrderDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Special Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="orders/special/delete" data-method="DELETE">
+                        <div class="mb-2">
+                            <label class="form-label small">Special Order ID</label>
+                            <select name="id" class="form-select form-select-sm" required>
+                                <option value="">Select Special Order</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Delete Special Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Create Modal -->
+    <div class="modal fade" id="orderCreateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="orders/create" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Order Type</label>
+                            <select name="order_type_id" class="form-select form-select-sm" required>
+                                <option value="">Select Order Type</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">User</label>
+                            <select name="userid" class="form-select form-select-sm" required>
+                                <option value="">Select User</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Table</label>
+                            <select name="table_id" class="form-select form-select-sm" required>
+                                <option value="">Select Table</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Create Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Delete Modal -->
+    <div class="modal fade" id="orderDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="orders/delete" data-method="DELETE">
+                        <div class="mb-2">
+                            <label class="form-label small">Order ID</label>
+                            <select name="order_id" class="form-select form-select-sm" required>
+                                <option value="">Select Order</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Delete Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Add Modal -->
+    <div class="modal fade" id="paymentAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="payments/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Order</label>
+                            <select name="order_id" class="form-select form-select-sm" required>
+                                <option value="">Select Order</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Payment Method</label>
+                            <select name="payment_method" class="form-select form-select-sm" required>
+                                <option value="cash">Cash</option>
+                                <option value="card">Card</option>
+                                <option value="mobile">Mobile Money</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Amount Paid</label>
+                            <input type="number" name="amount_paid" class="form-control form-control-sm" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Payment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Type Update Modal -->
+    <div class="modal fade" id="orderTypeUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Order Type</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="orders/type/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Type ID</label>
+                            <select name="order_type_id" class="form-select form-select-sm" required>
+                                <option value="">Select Type</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Type Name</label>
+                            <input type="text" name="order_type_name" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="order_type_status" class="form-select form-select-sm">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Type</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Add Modal -->
+    <div class="modal fade" id="stockAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="inventory/stocks/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Item Category</label>
+                            <select name="stock_item_cat_id" class="form-select form-select-sm" required>
+                                <option value="">Select Item Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Stock Name</label>
+                            <input type="text" name="stock_name" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Quantity</label>
+                            <input type="number" name="stock_qty" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="stock_status" class="form-select form-select-sm" required>
+                                <option value="available">Available</option>
+                                <option value="unavailable">Unavailable</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Stock</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Item Category Add Modal -->
+    <div class="modal fade" id="stockItemCategoryAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Stock Item Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="inventory/stock-item-category/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Category</label>
+                            <select name="stockcat_id" class="form-select form-select-sm" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Group</label>
+                            <select name="group_id" class="form-select form-select-sm" required>
+                                <option value="">Select Group</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Name</label>
+                            <input type="text" name="name" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="status" class="form-select form-select-sm" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Item Category</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Group Add Modal -->
+    <div class="modal fade" id="stockGroupAddModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Stock Group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="inventory/stock-group/add" data-method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small">Group Name</label>
+                            <input type="text" name="group_name" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Description</label>
+                            <input type="text" name="group_desc" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="status" class="form-select form-select-sm" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Category Update Modal -->
+    <div class="modal fade" id="menuCategoryUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Menu Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="menu/category/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Category ID</label>
+                            <select name="menu_cat_id" class="form-select form-select-sm" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Category Name</label>
+                            <input type="text" name="menu_cat_name" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Description</label>
+                            <input type="text" name="menu_cat_desc" class="form-control form-control-sm">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Category</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Update Modal -->
+    <div class="modal fade" id="menuUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="menu/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Menu ID</label>
+                            <select name="menu_id" class="form-select form-select-sm" required>
+                                <option value="">Select Menu</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Menu Name</label>
+                            <input type="text" name="menu_name" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Price</label>
+                            <input type="number" name="menu_price" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="menu_status" class="form-select form-select-sm">
+                                <option value="available">Available</option>
+                                <option value="unavailable">Unavailable</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Menu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Group Update Modal -->
+    <div class="modal fade" id="stockGroupUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Stock Group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="inventory/stock-group/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Group ID</label>
+                            <select name="group_id" class="form-select form-select-sm" required>
+                                <option value="">Select Group</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Group Name</label>
+                            <input type="text" name="group_name" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Description</label>
+                            <input type="text" name="group_desc" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="status" class="form-select form-select-sm">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Item Category Update Modal -->
+    <div class="modal fade" id="stockItemCategoryUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Stock Item Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="inventory/stock-item-category/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Item Category ID</label>
+                            <select name="stock_item_cat_id" class="form-select form-select-sm" required>
+                                <option value="">Select Item Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Name</label>
+                            <input type="text" name="name" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="status" class="form-select form-select-sm">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Item Category</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Update Modal -->
+    <div class="modal fade" id="stockUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="inventory/stocks/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Stock ID</label>
+                            <select name="stock_id" class="form-select form-select-sm" required>
+                                <option value="">Select Stock</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Stock Name</label>
+                            <input type="text" name="stock_name" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="stock_status" class="form-select form-select-sm">
+                                <option value="available">Available</option>
+                                <option value="unavailable">Unavailable</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Stock</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Special Order Update Modal -->
+    <div class="modal fade" id="specialOrderUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Special Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="orders/special/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Special Order ID</label>
+                            <select name="special_order_id" class="form-select form-select-sm" required>
+                                <option value="">Select Special Order</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Name</label>
+                            <input type="text" name="special_order_name" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Description</label>
+                            <input type="text" name="special_order_desc" class="form-control form-control-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Price</label>
+                            <input type="number" name="special_order_price" class="form-control form-control-sm">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Special Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Update Modal -->
+    <div class="modal fade" id="orderUpdateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Order Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="api-form" data-endpoint="orders/update" data-method="PUT">
+                        <div class="mb-2">
+                            <label class="form-label small">Order ID</label>
+                            <select name="order_id" class="form-select form-select-sm" required>
+                                <option value="">Select Order</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small">Status</label>
+                            <select name="order_status" class="form-select form-select-sm" required>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Update Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5 py-3 bg-light text-center">
+        <p class="mb-0 text-muted small">
+            Seleno Restaurant API Tester v1.0 |
+            <span id="timestamp" class="badge bg-secondary"></span>
+        </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        // Initialize API client
+        const api = new ApiClient();
+
+        // Check authentication
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'index.html';
+        }
+
+        // Display user info
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('userInfo').innerHTML =
+            `<i class="bi bi-person-circle"></i> ${user.names || 'User'} (${user.role || 'Unknown'})`;
+
+        // Update timestamp
+        document.getElementById('timestamp').textContent =
+            new Date().toLocaleString();
+
+        // Initialize sidebar navigation - show only users section by default
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById('users').classList.add('active');
+
+        // Change date inputs to text type for better UX
+        document.querySelectorAll('input[type="date"]').forEach(input => {
+            input.type = 'text';
+            input.placeholder = 'MM/DD/YYYY';
+            if (input.name === 'start_date' && !input.value) {
+                input.value = '01/01/2026';
+            }
+            if (input.name === 'end_date' && !input.value) {
+                input.value = new Date().toLocaleDateString('en-US');
+            }
+        });
+
+        // Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        });
+
+        // Handle form submissions
+        document.querySelectorAll('.api-form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const endpoint = form.dataset.endpoint;
+                const method = form.dataset.method;
+                const formData = new FormData(form);
+                let data = Object.fromEntries(formData);
+
+                // Convert date formats from MM/DD/YYYY to YYYY-MM-DD
+                for (const key in data) {
+                    if (key.includes('date') && data[key] && /^\d{2}\/\d{2}\/\d{4}$/.test(data[key])) {
+                        const [month, day, year] = data[key].split('/');
+                        data[key] = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    }
+                }
+
+                showMessage(`Sending ${method} request to ${endpoint}...`, 'info');
+
+                try {
+                    const result = await api.request(endpoint, method, data);
+                    displayResponse(result, endpoint);
+
+                    if (result.status === 'success') {
+                        showMessage('Operation successful!', 'success');
+                        // Handle report data display
+                        if (endpoint.startsWith('reports/')) {
+                            displayReportData(endpoint, result.data);
+                        }
+                        // Close modals on success
+                        const modals = document.querySelectorAll('.modal.show');
+                        modals.forEach(modal => {
+                            const bsModal = bootstrap.Modal.getInstance(modal);
+                            if (bsModal) bsModal.hide();
+                        });
+                    } else {
+                        showMessage(result.message || 'Operation failed', 'danger');
+                    }
+                } catch (error) {
+                    showMessage('Network error: ' + error.message, 'danger');
+                    displayResponse({ status: 'error', message: 'Network error: ' + error.message }, endpoint);
+                }
+            });
+        });
+
+        // Handle button clicks
+        document.querySelectorAll('.api-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const endpoint = btn.dataset.endpoint;
+                const method = btn.dataset.method;
+
+                showMessage(`Sending ${method} request to ${endpoint}...`, 'info');
+
+                try {
+                    const result = await api.request(endpoint, method);
+                    displayResponse(result, endpoint);
+
+                    if (result.status === 'success') {
+                        showMessage('Operation successful!', 'success');
+                    } else {
+                        showMessage(result.message || 'Operation failed', 'danger');
+                    }
+                } catch (error) {
+                    showMessage('Network error: ' + error.message, 'danger');
+                    displayResponse({ status: 'error', message: 'Network error: ' + error.message }, endpoint);
+                }
+            });
+        });
+
+        // Handle modal open buttons
+        document.querySelectorAll('.open-modal-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const modalId = btn.dataset.modal;
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                modal.show();
+            });
+        });
+
+        // Helper function to populate selects
+        async function populateSelect(selector, endpoint, displayFunc, idField = 'id') {
+            const select = document.querySelector(selector);
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">Loading...</option>';
+            try {
+                const result = await api.request(endpoint, 'GET');
+                if (result.status === 'success' && result.data && Array.isArray(result.data)) {
+                    select.innerHTML = '<option value="">Select an option</option>';
+                    result.data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item[idField];
+                        option.textContent = displayFunc(item);
+                        select.appendChild(option);
+                    });
+                } else {
+                    select.innerHTML = '<option value="">No data available</option>';
+                }
+            } catch (error) {
+                select.innerHTML = '<option value="">Error loading data</option>';
+                console.error('Error populating select:', error);
+            }
+        }
+
+        // Populate selects on modal show
+        document.getElementById('userUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#userUpdateModal select[name="userid"]', 'users/list', (user) => `${user.firstname || ''} ${user.lastname || ''} (${user.userid})`, 'userid');
+        });
+
+        document.getElementById('userDeleteModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#userDeleteModal select[name="userid"]', 'users/list', (user) => `${user.firstname || ''} ${user.lastname || ''} (${user.userid})`, 'userid');
+        });
+
+        document.getElementById('stockCategoryDeleteModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#stockCategoryDeleteModal select[name="stockcat_id"]', 'inventory/stock-category/list', (item) => `${item.stockcat_name} (${item.stockcat_id})`, 'stockcat_id');
+        });
+
+        document.getElementById('menuCategoryGroupUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#menuCategoryGroupUpdateModal select[name="menu_cat_group_id"]', 'menu/category-group/list', (item) => `${item.menu_cat_group_name} (${item.menu_cat_group_id})`, 'menu_cat_group_id');
+        });
+
+        document.getElementById('menuCategoryGroupDeleteModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#menuCategoryGroupDeleteModal select[name="menu_cat_group_id"]', 'menu/category-group/list', (item) => `${item.menu_cat_group_name} (${item.menu_cat_group_id})`, 'menu_cat_group_id');
+        });
+
+        document.getElementById('menuCategoryAddModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#menuCategoryAddModal select[name="menu_cat_group_id"]', 'menu/category-group/list', (item) => `${item.menu_cat_group_name} (${item.menu_cat_group_id})`, 'menu_cat_group_id');
+        });
+
+        document.getElementById('menuCategoryDeleteModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#menuCategoryDeleteModal select[name="id"]', 'menu/category/list', (item) => `${item.name} (${item.menu_cat_id})`, 'menu_cat_id');
+        });
+
+        document.getElementById('menuAddModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#menuAddModal select[name="menu_cat_id"]', 'menu/category/list', (item) => `${item.name} (${item.menu_cat_id})`, 'menu_cat_id');
+        });
+
+        document.getElementById('menuDeleteModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#menuDeleteModal select[name="id"]', 'menu/list', (item) => `${item.menu_name} (${item.menu_id})`, 'menu_id');
+        });
+
+        document.getElementById('tableGroupDeleteModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#tableGroupDeleteModal select[name="id"]', 'tables/group/list', (item) => `${item.table_group_name} (${item.table_group_id})`, 'table_group_id');
+        });
+
+        document.getElementById('tableAddModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#tableAddModal select[name="table_group_id"]', 'tables/group/list', (item) => `${item.table_group_name} (${item.table_group_id})`, 'table_group_id');
+        });
+
+        document.getElementById('orderTypeDeleteModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#orderTypeDeleteModal select[name="id"]', 'orders/type/list', (item) => `${item.order_type_name} (${item.order_type_id})`, 'order_type_id');
+        });
+
+        document.getElementById('specialOrderDeleteModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#specialOrderDeleteModal select[name="id"]', 'orders/special/list', (item) => `${item.special_order_name} (${item.special_order_id})`, 'special_order_id');
+        });
+
+        document.getElementById('orderCreateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#orderCreateModal select[name="order_type_id"]', 'orders/type/list', (item) => `${item.order_type_name} (${item.order_type_id})`, 'order_type_id');
+            populateSelect('#orderCreateModal select[name="userid"]', 'users/list', (item) => `${item.firstname} ${item.lastname} (${item.userid})`, 'userid');
+            populateSelect('#orderCreateModal select[name="table_id"]', 'tables/list', (item) => `${item.table_desc} (${item.table_id})`, 'table_id');
+        });
+
+        document.getElementById('orderDeleteModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#orderDeleteModal select[name="order_id"]', 'orders/list', (item) => `Order ${item.order_id}`, 'order_id');
+        });
+
+        document.getElementById('paymentAddModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#paymentAddModal select[name="order_id"]', 'orders/list', (item) => `Order ${item.order_id}`, 'order_id');
+        });
+
+        document.getElementById('stockAddModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#stockAddModal select[name="stock_item_cat_id"]', 'inventory/stock-item-category/list', (item) => `${item.name} (${item.stock_item_cat_id})`, 'stock_item_cat_id');
+        });
+
+        document.getElementById('stockItemCategoryAddModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#stockItemCategoryAddModal select[name="stockcat_id"]', 'inventory/stock-category/list', (item) => `${item.stockcat_name} (${item.stockcat_id})`, 'stockcat_id');
+            populateSelect('#stockItemCategoryAddModal select[name="group_id"]', 'inventory/stock-group/list', (item) => `${item.group_name} (${item.group_id})`, 'group_id');
+        });
+
+        document.getElementById('tableGroupUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#tableGroupUpdateModal select[name="table_group_id"]', 'tables/group/list', (item) => `${item.table_group_name} (${item.table_group_id})`, 'table_group_id');
+        });
+
+        document.getElementById('orderTypeUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#orderTypeUpdateModal select[name="order_type_id"]', 'orders/type/list', (item) => `${item.order_type_name} (${item.order_type_id})`, 'order_type_id');
+        });
+
+        document.getElementById('menuCategoryUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#menuCategoryUpdateModal select[name="menu_cat_id"]', 'menu/category/list', (item) => `${item.name} (${item.menu_cat_id})`, 'menu_cat_id');
+        });
+
+        document.getElementById('menuUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#menuUpdateModal select[name="menu_id"]', 'menu/list', (item) => `${item.menu_name} (${item.menu_id})`, 'menu_id');
+        });
+
+        document.getElementById('stockGroupUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#stockGroupUpdateModal select[name="group_id"]', 'inventory/stock-group/list', (item) => `${item.group_name} (${item.group_id})`, 'group_id');
+        });
+
+        document.getElementById('stockItemCategoryUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#stockItemCategoryUpdateModal select[name="stock_item_cat_id"]', 'inventory/stock-item-category/list', (item) => `${item.name} (${item.stock_item_cat_id})`, 'stock_item_cat_id');
+        });
+
+        document.getElementById('stockUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#stockUpdateModal select[name="stock_id"]', 'inventory/stocks/list', (item) => `${item.stock_name} (${item.stock_id})`, 'stock_id');
+        });
+
+        document.getElementById('specialOrderUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#specialOrderUpdateModal select[name="special_order_id"]', 'orders/special/list', (item) => `${item.special_order_name} (${item.special_order_id})`, 'special_order_id');
+        });
+
+        document.getElementById('orderUpdateModal').addEventListener('show.bs.modal', () => {
+            populateSelect('#orderUpdateModal select[name="order_id"]', 'orders/list', (item) => `Order ${item.order_id}`, 'order_id');
+        });
+
+        // Populate add form selects on page load
+        populateSelect('form[data-endpoint="orders/items/add"] select[name="order_id"]', 'orders/list', (item) => `Order ${item.order_id}`, 'order_id');
+        populateSelect('form[data-endpoint="orders/items/add"] select[name="menu_id"]', 'menu/list', (item) => `${item.menu_name} (${item.menu_id})`, 'menu_id');
+        populateSelect('form[data-endpoint="payments/status"] select[name="order_id"]', 'orders/list', (item) => `Order ${item.order_id}`, 'order_id');
+        populateSelect('form[data-endpoint="inventory/stockin/add"] select[name="stock_id"]', 'inventory/stocks/list', (item) => `${item.stock_name} (${item.stock_id})`, 'stock_id');
+        populateSelect('form[data-endpoint="inventory/stockin/add"] select[name="userid"]', 'users/list', (item) => `${item.firstname} ${item.lastname} (${item.userid})`, 'userid');
+        populateSelect('form[data-endpoint="inventory/stockout/add"] select[name="stock_id"]', 'inventory/stocks/list', (item) => `${item.stock_name} (${item.stock_id})`, 'stock_id');
+        populateSelect('form[data-endpoint="inventory/stockout/add"] select[name="userid"]', 'users/list', (item) => `${item.firstname} ${item.lastname} (${item.userid})`, 'userid');
+
+        // Populate delete form selects on page load
+        populateSelect('form[data-endpoint="users/delete"] select[name="userid"]', 'users/list', (user) => `${user.firstname} ${user.lastname} (${user.userid})`, 'userid');
+        populateSelect('form[data-endpoint="inventory/stock-category/delete"] select[name="stockcat_id"]', 'inventory/stock-category/list', (item) => `${item.stockcat_name} (${item.stockcat_id})`, 'stockcat_id');
+        populateSelect('form[data-endpoint="inventory/stock-group/delete"] select[name="group_id"]', 'inventory/stock-group/list', (item) => `${item.group_name} (${item.group_id})`, 'group_id');
+        populateSelect('form[data-endpoint="inventory/stock-item-category/delete"] select[name="id"]', 'inventory/stock-item-category/list', (item) => `${item.name} (${item.stock_item_cat_id})`, 'stock_item_cat_id');
+        populateSelect('form[data-endpoint="inventory/stocks/delete"] select[name="stock_id"]', 'inventory/stocks/list', (item) => `${item.stock_name} (${item.stock_id})`, 'stock_id');
+        populateSelect('form[data-endpoint="menu/category-group/delete"] select[name="id"]', 'menu/category-group/list', (item) => `${item.menu_cat_group_name} (${item.menu_cat_group_id})`, 'menu_cat_group_id');
+        populateSelect('form[data-endpoint="menu/category/delete"] select[name="id"]', 'menu/category/list', (item) => `${item.name} (${item.menu_cat_id})`, 'menu_cat_id');
+        populateSelect('form[data-endpoint="menu/delete"] select[name="id"]', 'menu/list', (item) => `${item.menu_name} (${item.menu_id})`, 'menu_id');
+        populateSelect('form[data-endpoint="tables/group/delete"] select[name="id"]', 'tables/group/list', (item) => `${item.table_group_name} (${item.table_group_id})`, 'table_group_id');
+        populateSelect('form[data-endpoint="orders/type/delete"] select[name="id"]', 'orders/type/list', (item) => `${item.order_type_name} (${item.order_type_id})`, 'order_type_id');
+        populateSelect('form[data-endpoint="orders/special/delete"] select[name="id"]', 'orders/special/list', (item) => `${item.special_order_name} (${item.special_order_id})`, 'special_order_id');
+        populateSelect('form[data-endpoint="orders/delete"] select[name="order_id"]', 'orders/list', (item) => `Order ${item.order_id}`, 'order_id');
+
+        // Message functions
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            const messageText = document.getElementById('messageText');
+            messageText.textContent = text;
+            messageDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            messageDiv.style.display = 'block';
+        }
+
+        function hideMessage() {
+            document.getElementById('message').style.display = 'none';
+        }
+
+        // Display response
+        function displayResponse(result, endpoint) {
+            const responseDiv = document.getElementById('response');
+
+            // Create response card
+            const responseCard = document.createElement('div');
+            responseCard.className = 'card mb-3';
+
+            const timestamp = new Date().toLocaleTimeString();
+            const alertClass = result.status === 'success' ? 'alert-success' : 'alert-danger';
+
+            responseCard.innerHTML = `
+                <div class="card-header ${result.status === 'success' ? 'bg-success' : 'bg-danger'} text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>${endpoint} - ${result.status === 'success' ? '✅ Success' : '❌ Error'}</span>
+                        <small>${timestamp}</small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    ${result.message ? `<p><strong>Message:</strong> ${result.message}</p>` : ''}
+                    <pre class="mb-0" style="font-size: 12px;">${JSON.stringify(result, null, 2)}</pre>
+                </div>
+            `;
+
+            responseDiv.prepend(responseCard);
+            responseDiv.scrollTop = 0;
+        }
+
+        // Display report data
+        function displayReportData(endpoint, data) {
+            let reportDivId;
+            if (endpoint === 'reports/sales') {
+                reportDivId = 'salesReportData';
+            } else if (endpoint === 'reports/inventory') {
+                reportDivId = 'inventoryReportData';
+            } else if (endpoint === 'reports/stock-movement') {
+                reportDivId = 'stockMovementReportData';
+            } else if (endpoint === 'reports/orders') {
+                reportDivId = 'orderReportData';
+            } else if (endpoint === 'reports/payments') {
+                reportDivId = 'paymentReportData';
+            } else if (endpoint === 'reports/user-activity') {
+                reportDivId = 'userActivityReportData';
+            }
+
+            if (reportDivId) {
+                const reportDiv = document.getElementById(reportDivId);
+                if (reportDiv) {
+                    reportDiv.innerHTML = formatReportData(endpoint, data);
+                }
+            }
+        }
+
+        // Format report data for display
+        function formatReportData(endpoint, data) {
+            if (endpoint === 'reports/sales') {
+                return `
+                    <h5>Sales Summary</h5>
+                    <p><strong>Total Sales:</strong> $${data.total_sales ? data.total_sales.toFixed(2) : '0.00'}</p>
+                    <h6>Menu Sales</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Menu Item</th>
+                                <th>Quantity</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.menu_sales ? data.menu_sales.map(item => `
+                                <tr>
+                                    <td>${item.menu_name}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>$${(item.revenue || 0).toFixed(2)}</td>
+                                </tr>
+                            `).join('') : ''}
+                        </tbody>
+                    </table>
+                    <h6>Daily Sales</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Sales</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.daily_sales ? Object.entries(data.daily_sales).map(([date, sales]) => `
+                                <tr>
+                                    <td>${date}</td>
+                                    <td>$${(sales || 0).toFixed(2)}</td>
+                                </tr>
+                            `).join('') : ''}
+                        </tbody>
+                    </table>
+                `;
+            } else if (endpoint === 'reports/inventory') {
+                return `
+                    <h5>Inventory Summary</h5>
+                    <p><strong>Total Items:</strong> ${data.total_items || 0}</p>
+                    <p><strong>Total Value:</strong> $${(data.total_inventory_value || 0).toFixed(2)}</p>
+                    <h6>Low Stock Items</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.low_stock_items ? data.low_stock_items.map(item => `
+                                <tr>
+                                    <td>${item.stock_name}</td>
+                                    <td>${item.stock_qty}</td>
+                                </tr>
+                            `).join('') : ''}
+                        </tbody>
+                    </table>
+                    <h6>Out of Stock Items</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.out_of_stock_items ? data.out_of_stock_items.map(item => `
+                                <tr>
+                                    <td>${item.stock_name}</td>
+                                    <td>${item.stock_qty}</td>
+                                </tr>
+                            `).join('') : ''}
+                        </tbody>
+                    </table>
+                `;
+            } else if (endpoint === 'reports/stock-movement') {
+                return `
+                    <h5>Stock Movement</h5>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.movements ? data.movements.map(movement => `
+                                <tr>
+                                    <td>${movement.date}</td>
+                                    <td>${movement.type}</td>
+                                    <td>${movement.stock_name}</td>
+                                    <td>${movement.quantity}</td>
+                                    <td>${movement.user}</td>
+                                </tr>
+                            `).join('') : ''}
+                        </tbody>
+                    </table>
+                `;
+            } else if (endpoint === 'reports/orders') {
+                return `
+                    <h5>Order Summary</h5>
+                    <p><strong>Total Orders:</strong> ${data.total_orders || 0}</p>
+                    <p><strong>Completed Orders:</strong> ${data.completed_orders || 0}</p>
+                    <h6>Status Breakdown</h6>
+                    <ul>
+                        ${data.status_breakdown ? Object.entries(data.status_breakdown).map(([status, count]) => `
+                            <li>${status}: ${count}</li>
+                        `).join('') : ''}
+                    </ul>
+                `;
+            } else if (endpoint === 'reports/payments') {
+                return `
+                    <h5>Payment Summary</h5>
+                    <p><strong>Total Payments:</strong> $${(data.total_payments || 0).toFixed(2)}</p>
+                    <h6>Method Breakdown</h6>
+                    <ul>
+                        ${data.method_breakdown ? Object.entries(data.method_breakdown).map(([method, amount]) => `
+                            <li>${method}: $${(amount || 0).toFixed(2)}</li>
+                        `).join('') : ''}
+                    </ul>
+                `;
+            } else if (endpoint === 'reports/user-activity') {
+                return `
+                    <h5>User Activity</h5>
+                    <p><strong>Total Users:</strong> ${data.total_users || 0}</p>
+                    <p><strong>Active Users:</strong> ${data.active_users || 0}</p>
+                    <h6>Role Breakdown</h6>
+                    <ul>
+                        ${data.role_breakdown ? Object.entries(data.role_breakdown).map(([role, count]) => `
+                            <li>${role}: ${count}</li>
+                        `).join('') : ''}
+                    </ul>
+                `;
+            }
+            return '<p>No data available</p>';
+        }
+
+        // Clear response
+        function clearResponse() {
+            document.getElementById('response').innerHTML = '';
+            showMessage('Response area cleared', 'info');
+        }
+
+        // Export results
+        function exportResults() {
+            const responses = document.getElementById('response').innerHTML;
+            const blob = new Blob([responses], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `seleno-api-test-${new Date().toISOString().slice(0, 10)}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showMessage('Results exported successfully!', 'success');
+        }
+
+        // Test all endpoints
+        async function testAllEndpoints() {
+            const endpoints = [
+                { endpoint: 'users/list', method: 'GET' },
+                { endpoint: 'inventory/stock-category/list', method: 'GET' },
+                { endpoint: 'inventory/stock-group/list', method: 'GET' },
+                { endpoint: 'inventory/stock-item-category/list', method: 'GET' },
+                { endpoint: 'inventory/stocks/list', method: 'GET' },
+                { endpoint: 'menu/category-group/list', method: 'GET' },
+                { endpoint: 'menu/category/list', method: 'GET' },
+                { endpoint: 'menu/list', method: 'GET' },
+                { endpoint: 'tables/group/list', method: 'GET' },
+                { endpoint: 'tables/list', method: 'GET' },
+                { endpoint: 'orders/type/list', method: 'GET' },
+                { endpoint: 'orders/special/list', method: 'GET' },
+                { endpoint: 'orders/list', method: 'GET' },
+                { endpoint: 'reports/sales', method: 'GET' },
+                { endpoint: 'reports/inventory', method: 'GET' },
+                { endpoint: 'reports/stock-movement', method: 'GET' },
+                { endpoint: 'reports/orders', method: 'GET' },
+                { endpoint: 'reports/payments', method: 'GET' },
+                { endpoint: 'reports/user-activity', method: 'GET' }
+            ];
+
+            const progressBar = document.getElementById('testProgress');
+            const testStatus = document.getElementById('testStatus');
+            const total = endpoints.length;
+            let success = 0;
+            let failed = 0;
+
+            clearResponse();
+            showMessage(`Testing ${total} endpoints...`, 'info');
+
+            for (let i = 0; i < endpoints.length; i++) {
+                const { endpoint, method } = endpoints[i];
+                const progress = Math.round((i / total) * 100);
+                progressBar.style.width = `${progress}%`;
+                testStatus.textContent = `Testing ${i + 1}/${total}: ${endpoint}`;
+
+                try {
+                    const result = await api.request(endpoint, method);
+                    if (result.status === 'success') {
+                        success++;
+                        displayResponse(result, endpoint);
+                    } else {
+                        failed++;
+                        displayResponse(result, endpoint);
+                    }
+                } catch (error) {
+                    failed++;
+                    displayResponse({
+                        status: 'error',
+                        message: 'Network error: ' + error.message
+                    }, endpoint);
+                }
+
+                // Small delay to avoid overwhelming the server
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            progressBar.style.width = '100%';
+            progressBar.className = failed === 0 ? 'progress-bar bg-success' : 'progress-bar bg-warning';
+            testStatus.textContent = `Complete: ${success} passed, ${failed} failed`;
+
+            showMessage(`Test completed: ${success} passed, ${failed} failed`,
+                failed === 0 ? 'success' : 'warning');
+        }
+
+        // Sidebar navigation - show/hide sections
+        document.querySelectorAll('.nav-link[href^="#"]').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1); // Remove #
+                
+                // Hide all sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show target section
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(navLink => {
+                    navLink.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        // Initialize tabs
+        const tabTriggers = document.querySelectorAll('[data-bs-toggle="tab"]');
+        tabTriggers.forEach(trigger => {
+            trigger.addEventListener('click', function () {
+                // Update active states
+                tabTriggers.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Auto-hide message after 5 seconds
+        setInterval(() => {
+            const messageDiv = document.getElementById('message');
+            if (messageDiv.style.display === 'block') {
+                const alertType = messageDiv.className.includes('alert-success') ? 'success' :
+                    messageDiv.className.includes('alert-danger') ? 'danger' : 'info';
+                if (alertType !== 'danger') { // Don't auto-hide error messages
+                    hideMessage();
+                }
+            }
+        }, 5000);
+    </script>
+</body>
+
+</html>
