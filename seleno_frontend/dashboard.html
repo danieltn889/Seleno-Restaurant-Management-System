@@ -91,40 +91,211 @@
                     <div class="card-body">
                         <h6 class="card-title mb-3">📋 Navigation</h6>
                         <ul class="nav flex-column">
+                            <!-- User Management -->
                             <li class="nav-item">
-                                <a class="nav-link active" href="#users">
-                                    👥 User Management
+                                <a class="nav-link" href="#users" data-bs-toggle="collapse" data-bs-target="#userSubmenu" aria-expanded="false">
+                                    👥 User Management <i class="bi bi-chevron-down float-end"></i>
                                 </a>
+                                <div class="collapse" id="userSubmenu">
+                                    <ul class="nav flex-column ms-3">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#users" onclick="showTab('usersTab', 'addUser')">
+                                                ➕ Add User
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#users" onclick="showTab('usersTab', 'listUsers')">
+                                                📋 List Users
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#users" onclick="showTab('usersTab', 'updateUser')">
+                                                ✏️ Update User
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#users" onclick="showTab('usersTab', 'deleteUser')">
+                                                🗑️ Delete User
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
+
+                            <!-- Inventory Management -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#inventory">
-                                    📦 Inventory Management
+                                <a class="nav-link" href="#inventory" data-bs-toggle="collapse" data-bs-target="#inventorySubmenu" aria-expanded="false">
+                                    📦 Inventory Management <i class="bi bi-chevron-down float-end"></i>
                                 </a>
+                                <div class="collapse" id="inventorySubmenu">
+                                    <ul class="nav flex-column ms-3">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#inventory" onclick="showTab('inventoryTab', 'stockCategories')">
+                                                📁 Stock Categories
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#inventory" onclick="showTab('inventoryTab', 'stockGroups')">
+                                                📂 Stock Groups
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#inventory" onclick="showTab('inventoryTab', 'stockItemCategories')">
+                                                🏷️ Item Categories
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#inventory" onclick="showTab('inventoryTab', 'stocks')">
+                                                📦 Stocks
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#inventory" onclick="showTab('inventoryTab', 'stockIn')">
+                                                📥 Stock In
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#inventory" onclick="showTab('inventoryTab', 'stockOut')">
+                                                📤 Stock Out
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
+
+                            <!-- Menu Management -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#menu">
-                                    🍽️ Menu Management
+                                <a class="nav-link" href="#menu" data-bs-toggle="collapse" data-bs-target="#menuSubmenu" aria-expanded="false">
+                                    🍽️ Menu Management <i class="bi bi-chevron-down float-end"></i>
                                 </a>
+                                <div class="collapse" id="menuSubmenu">
+                                    <ul class="nav flex-column ms-3">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#menu" onclick="showTab('menuTab', 'menuGroups')">
+                                                📂 Category Groups
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#menu" onclick="showTab('menuTab', 'menuCategories')">
+                                                📁 Categories
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#menu" onclick="showTab('menuTab', 'menus')">
+                                                🍽️ Menus
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#menu" onclick="showTab('menuTab', 'menuItems')">
+                                                🍕 Menu Items
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
+
+                            <!-- Tables Management -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#tables">
-                                    🪑 Tables Management
+                                <a class="nav-link" href="#tables" data-bs-toggle="collapse" data-bs-target="#tablesSubmenu" aria-expanded="false">
+                                    🪑 Tables Management <i class="fas fa-chevron-down float-end"></i>
                                 </a>
+                                <div class="collapse" id="tablesSubmenu">
+                                    <ul class="nav flex-column ms-3">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#tables" onclick="showTab('tablesTab', 'tableGroups')">
+                                                📂 Table Groups
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#tables" onclick="showTab('tablesTab', 'tablesList')">
+                                                🪑 Tables
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
+
+                            <!-- Orders Management -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#orders">
-                                    📋 Orders Management
+                                <a class="nav-link" href="#orders" data-bs-toggle="collapse" data-bs-target="#ordersSubmenu" aria-expanded="false">
+                                    📋 Orders Management <i class="bi bi-chevron-down float-end"></i>
                                 </a>
+                                <div class="collapse" id="ordersSubmenu">
+                                    <ul class="nav flex-column ms-3">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#orders" onclick="showTab('ordersTab', 'specialOrders')">
+                                                ⭐ Special Orders
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#orders" onclick="showTab('ordersTab', 'orderMain')">
+                                                📋 Orders
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
+
+                            <!-- Payments -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#payments">
-                                    💳 Payments
+                                <a class="nav-link" href="#payments" data-bs-toggle="collapse" data-bs-target="#paymentsSubmenu" aria-expanded="false">
+                                    💳 Payments <i class="bi bi-chevron-down float-end"></i>
                                 </a>
+                                <div class="collapse" id="paymentsSubmenu">
+                                    <ul class="nav flex-column ms-3">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#payments" onclick="showTab('paymentsTab', 'addPayment')">
+                                                ➕ Add Payment
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#payments" onclick="showTab('paymentsTab', 'checkPayment')">
+                                                🔍 Check Status
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
+
+                            <!-- Reports -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#reports">
-                                    📊 Reports
+                                <a class="nav-link" href="#reports" data-bs-toggle="collapse" data-bs-target="#reportsSubmenu" aria-expanded="false">
+                                    📊 Reports <i class="bi bi-chevron-down float-end"></i>
                                 </a>
+                                <div class="collapse" id="reportsSubmenu">
+                                    <ul class="nav flex-column ms-3">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#reports" onclick="showTab('reportsTab', 'salesReport')">
+                                                💰 Sales
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#reports" onclick="showTab('reportsTab', 'inventoryReport')">
+                                                📦 Inventory
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#reports" onclick="showTab('reportsTab', 'stockMovement')">
+                                                📈 Stock Movement
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#reports" onclick="showTab('reportsTab', 'orderReport')">
+                                                📋 Orders
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#reports" onclick="showTab('reportsTab', 'paymentReport')">
+                                                💳 Payments
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#reports" onclick="showTab('reportsTab', 'userActivity')">
+                                                👥 User Activity
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
                         </ul>
 
@@ -3226,6 +3397,31 @@
 
             showMessage(`Test completed: ${success} passed, ${failed} failed`,
                 failed === 0 ? 'success' : 'warning');
+        // Function to show specific tab in a section
+        function showTab(tabGroupId, tabId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show target section (extract section id from tab group id)
+            const sectionId = tabGroupId.replace('Tab', '').toLowerCase();
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(navLink => {
+                navLink.classList.remove('active');
+            });
+            
+            // Activate the specific tab
+            const tabElement = document.getElementById(tabId + '-tab');
+            if (tabElement) {
+                const tab = new bootstrap.Tab(tabElement);
+                tab.show();
+            }
         }
 
         // Sidebar navigation - show/hide sections
