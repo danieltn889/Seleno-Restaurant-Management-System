@@ -28,6 +28,31 @@ class User extends BaseModel {
         return false;
     }
 
+    public function setSessionToken($userid, $token) {
+        $query = "UPDATE {$this->table} SET session_token = :token WHERE userid = :userid";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':token', $token);
+        $stmt->bindParam(':userid', $userid);
+        return $stmt->execute();
+    }
+
+    public function validateSessionToken($userid, $token) {
+        $query = "SELECT session_token FROM {$this->table} WHERE userid = :userid";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':userid', $userid);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $result && $result['session_token'] === $token;
+    }
+
+    public function clearSessionToken($userid) {
+        $query = "UPDATE {$this->table} SET session_token = NULL WHERE userid = :userid";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':userid', $userid);
+        return $stmt->execute();
+    }
+
     public function findByDateRange($startDate, $endDate) {
         $query = "SELECT * FROM {$this->table} WHERE DATE(created_at) BETWEEN ? AND ? ORDER BY created_at DESC";
         $stmt = $this->db->prepare($query);

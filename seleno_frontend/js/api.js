@@ -1,6 +1,6 @@
 class ApiClient {
     constructor() {
-        this.baseUrl = 'http://localhost:8080/SRMS/seleno_backend/';
+        this.baseUrl = 'https://gakoshop.xyz/seleno_backend/';
         this.token = localStorage.getItem('token');
     }
 

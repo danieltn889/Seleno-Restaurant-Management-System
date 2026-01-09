@@ -12,7 +12,9 @@ class Database {
     
     private function __construct() {
         $host = 'localhost';
-        $dbname = 'selen_restaurant';
+        $dbname = 'linkmobile_seleno';
+        // $username = 'linkmobile_seleno';
+        // $password = 'linkmobile_seleno';
         $username = 'root';
         $password = '';
         
@@ -66,11 +68,38 @@ class Database {
             $this->createTables();
             $this->insertSampleData();
         } else {
-            // Tables exist, check if users table is empty
+            // Tables exist, check if users table has session_token column
+            $this->ensureSessionTokenColumn();
+            
+            // Check if users table is empty
             $count = $this->connection->query("SELECT COUNT(*) as count FROM users")->fetch()['count'];
             if ($count == 0) {
                 $this->insertSampleData();
             }
+        }
+    }
+    
+    private function ensureSessionTokenColumn() {
+        try {
+            // Check if session_token column exists
+            $result = $this->connection->query("DESCRIBE users");
+            $columns = $result->fetchAll(PDO::FETCH_ASSOC);
+            
+            $hasSessionToken = false;
+            foreach ($columns as $column) {
+                if ($column['Field'] === 'session_token') {
+                    $hasSessionToken = true;
+                    break;
+                }
+            }
+            
+            if (!$hasSessionToken) {
+                // Add the session_token column
+                $this->connection->exec("ALTER TABLE users ADD COLUMN session_token VARCHAR(255) NULL");
+                error_log("session_token column added to users table");
+            }
+        } catch (Exception $e) {
+            error_log("Error checking/adding session_token column: " . $e->getMessage());
         }
     }
     
@@ -88,6 +117,7 @@ class Database {
             user_password VARCHAR(255) NOT NULL,
             user_role VARCHAR(255),
             user_status ENUM('active', 'inactive') DEFAULT 'active',
+            session_token VARCHAR(255) NULL,
             user_created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             user_updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         );

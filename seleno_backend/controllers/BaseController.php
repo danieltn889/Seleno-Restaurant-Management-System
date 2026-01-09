@@ -5,8 +5,24 @@ namespace Controllers;
 
 class BaseController {
     protected function jsonResponse($data, $status = 200) {
-        // CORS headers
-        header('Access-Control-Allow-Origin: http://localhost:8080');
+        // CORS headers - dynamic based on origin
+        $allowed_origins = [
+            'http://localhost',
+            'https://gakoshop.xyz',
+            'http://localhost:5173',
+            'http://localhost:8080',
+            'http://localhost:8081',
+            'http://localhost:8082',
+            'http://localhost:8083',
+            'http://localhost:8084'
+        ];
+        
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        if (in_array($origin, $allowed_origins)) {
+            header("Access-Control-Allow-Origin: $origin");
+            header('Access-Control-Allow-Credentials: true');
+        }
+        
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
         header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
         

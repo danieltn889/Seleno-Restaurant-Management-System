@@ -2,6 +2,8 @@
 return [
     // Authentication
     ['POST', '/login', 'AuthController@login'],
+    ['POST', '/validate-token', 'AuthController@validateToken'],
+    ['POST', '/logout', 'AuthController@logout'],
 
     // User Management
     ['POST', '/users/add', 'UserController@addUser'],
@@ -94,10 +96,10 @@ return [
     ['GET', '/payments/status', 'PaymentController@checkPaymentStatus'],
 
     // Reports
-    ['GET', '/reports/sales', 'ReportsController@salesReport'],
-    ['GET', '/reports/inventory', 'ReportsController@inventoryReport'],
-    ['GET', '/reports/stock-movement', 'ReportsController@stockMovementReport'],
-    ['GET', '/reports/orders', 'ReportsController@orderReport'],
-    ['GET', '/reports/payments', 'ReportsController@paymentReport'],
-    ['GET', '/reports/user-activity', 'ReportsController@userActivityReport'],
+    ['GET', '/reports/sales.php', 'ReportsController@salesReport'],
+    ['GET', '/reports/inventory.php', 'ReportsController@inventoryReport'],
+    ['GET', '/reports/stock-movement.php', 'ReportsController@stockMovementReport'],
+    ['GET', '/reports/orders.php', 'ReportsController@orderReport'],
+    ['GET', '/reports/payments.php', 'ReportsController@paymentReport'],
+    ['GET', '/reports/user-activity.php', 'ReportsController@userActivityReport'],
 ];

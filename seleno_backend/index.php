@@ -1,20 +1,47 @@
 <?php
-// index.php
+// 1. CORS CONFIGURATION
+$allowed_origins = [
+    'http://localhost',
+    'https://gakoshop.xyz',
+    'http://localhost:5173',
+    'http://localhost:8080',
+    'http://localhost:8081',
+    'http://localhost:8082',
+    'http://localhost:8083',
+    'http://localhost:8084',
+    'http://localhost:8085',
+    'http://localhost:8086'
+];
 
-// Handle CORS preflight OPTIONS requests
+// Get the origin from the request headers
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+// Check if origin is allowed
+if (in_array($origin, $allowed_origins)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header('Access-Control-Allow-Credentials: true');
+}
+
+// Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header('Access-Control-Allow-Origin: http://localhost:8080');
+    if (in_array($origin, $allowed_origins)) {
+        header("Access-Control-Allow-Origin: $origin");
+    }
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
     header('Content-Type: application/json');
+    header('Content-Length: 0');
     http_response_code(200);
-    exit(0);
+    exit; // Stop execution here
 }
 
-// Suppress warnings to prevent "headers already sent" errors
-error_reporting(E_ERROR | E_PARSE);
+// 2. BOOTSTRAPPING
+require_once 'config/Database.php';
+require_once 'core/Router.php';
+require_once 'core/Request.php';
+require_once 'middleware/AuthMiddleware.php';
 
-// Auto-load controllers and models
+// Auto-load classes
 spl_autoload_register(function ($class) {
     $parts = explode('\\', $class);
     $map = [
@@ -31,44 +58,30 @@ spl_autoload_register(function ($class) {
     }
 });
 
-require_once 'config/Database.php';
-require_once 'core/Router.php';
-require_once 'core/Request.php';
-require_once 'middleware/AuthMiddleware.php';
-
-// Create router
+// 3. ROUTING
 $router = new Core\Router();
-
-// Load routes from routes/api.php
 $routes = require_once 'routes/api.php';
+
 foreach ($routes as $route) {
-    try {
-        // Handle both formats: ['method', 'path', 'Controller@method'] or ['method', 'path', 'Controller', 'method']
-        if (count($route) === 3) {
-            // Format: ['method', 'path', 'Controller@method']
-            list($method, $path, $controllerAction) = $route;
-            if (strpos($controllerAction, '@') === false) {
-                continue; // Skip invalid routes
-            }
-            list($controller, $action) = explode('@', $controllerAction);
-            $router->addRoute($method, $path, $controller, $action);
-        } elseif (count($route) === 4) {
-            // Format: ['method', 'path', 'Controller', 'method']
-            $router->addRoute($route[0], $route[1], $route[2], $route[3]);
-        }
-    } catch (Exception $e) {
-        // Skip invalid routes
-        continue;
+    // Format: ['GET', '/path', 'Controller@method']
+    if (count($route) === 3 && strpos($route[2], '@') !== false) {
+        list($method, $path, $controllerAction) = $route;
+        list($controller, $action) = explode('@', $controllerAction);
+        $router->addRoute($method, $path, $controller, $action);
+    } 
+    // Format: ['GET', '/path', 'Controller', 'method']
+    elseif (count($route) === 4) {
+        $router->addRoute($route[0], $route[1], $route[2], $route[3]);
     }
 }
 
-// Handle the request
+// 4. DISPATCH
 $request = new Core\Request();
 
-// Check authentication for API routes
+// Check Auth BEFORE dispatching
 if (AuthMiddleware::requiresAuth($request->getUri())) {
-    AuthMiddleware::validateAuth();
+    AuthMiddleware::validateAuth(); // This should exit() if auth fails
 }
 
-// Dispatch the request
 $router->dispatch($request->getMethod(), $request->getUri());
+?>
