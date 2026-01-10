@@ -9,7 +9,7 @@ const handleError = (error) => {
 // ========== Order Type ==========
 export const addOrderType = async (data) => {
   try {
-    const response = await api.post("/orders/type/add.php", data);
+    const response = await api.post("/orders/type/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -18,7 +18,7 @@ export const addOrderType = async (data) => {
 
 export const listOrderTypes = async () => {
   try {
-    const response = await api.get("/orders/type/list.php");
+    const response = await api.get("/orders/type/list");
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -27,7 +27,7 @@ export const listOrderTypes = async () => {
 
 export const updateOrderType = async (data) => {
   try {
-    const response = await api.put("/orders/type/update.php", data);
+    const response = await api.put("/orders/type/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -36,7 +36,7 @@ export const updateOrderType = async (data) => {
 
 export const deleteOrderType = async (id) => {
   try {
-    const response = await api.delete(`/orders/type/delete.php?id=${id}`);
+    const response = await api.delete(`/orders/type/delete?id=${id}`);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -46,7 +46,7 @@ export const deleteOrderType = async (id) => {
 // ========== Special Orders ==========
 export const addSpecialOrder = async (data) => {
   try {
-    const response = await api.post("/orders/special/add.php", data);
+    const response = await api.post("/orders/special/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -55,7 +55,7 @@ export const addSpecialOrder = async (data) => {
 
 export const listSpecialOrders = async () => {
   try {
-    const response = await api.get("/orders/special/list.php");
+    const response = await api.get("/orders/special/list");
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -64,7 +64,7 @@ export const listSpecialOrders = async () => {
 
 export const updateSpecialOrder = async (data) => {
   try {
-    const response = await api.put("/orders/special/update.php", data);
+    const response = await api.put("/orders/special/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -73,7 +73,7 @@ export const updateSpecialOrder = async (data) => {
 
 export const deleteSpecialOrder = async (id) => {
   try {
-    const response = await api.delete(`/orders/special/delete.php?id=${id}`);
+    const response = await api.delete(`/orders/special/delete?id=${id}`);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -83,7 +83,7 @@ export const deleteSpecialOrder = async (id) => {
 // ========== Orders ==========
 export const createOrder = async (data) => {
   try {
-    const response = await api.post("/orders/create.php", data);
+    const response = await api.post("/orders/create", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -92,7 +92,7 @@ export const createOrder = async (data) => {
 
 export const listOrders = async () => {
   try {
-    const response = await api.get("/orders/list.php");
+    const response = await api.get("/orders/list");
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -101,7 +101,7 @@ export const listOrders = async () => {
 
 export const updateOrderStatus = async (data) => {
   try {
-    const response = await api.put("/orders/update.php", data);
+    const response = await api.put("/orders/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -110,7 +110,7 @@ export const updateOrderStatus = async (data) => {
 
 export const deleteOrder = async (order_id) => {
   try {
-    const response = await api.delete(`/orders/delete.php?order_id=${order_id}`);
+    const response = await api.delete(`/orders/delete?order_id=${order_id}`);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -120,7 +120,7 @@ export const deleteOrder = async (order_id) => {
 // ========== Order Items ==========
 export const addOrderItem = async (data) => {
   try {
-    const response = await api.post("/orders/items/add.php", data);
+    const response = await api.post("/orders/items/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -129,7 +129,7 @@ export const addOrderItem = async (data) => {
 
 export const listOrderItems = async (order_id) => {
   try {
-    const response = await api.get(`/orders/items/list.php?order_id=${order_id}`);
+    const response = await api.get(`/orders/items/list?order_id=${order_id}`);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -138,7 +138,16 @@ export const listOrderItems = async (order_id) => {
 
 export const updateOrderItem = async (data) => {
   try {
-    const response = await api.put("/orders/items/update.php", data);
+    const response = await api.put("/orders/items/update", data);
+    return response.data;
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export const updateOrder = async (data) => {
+  try {
+    const response = await api.put("/orders/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -147,7 +156,7 @@ export const updateOrderItem = async (data) => {
 
 export const deleteOrderItem = async (id) => {
   try {
-    const response = await api.delete(`/orders/items/delete.php?id=${id}`);
+    const response = await api.delete(`/orders/items/delete?id=${id}`);
     return response.data;
   } catch (error) {
     return handleError(error);

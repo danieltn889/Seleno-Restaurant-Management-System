@@ -1,19 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
-
-// 🔹 Dummy table groups
-const tableGroups = [
-  { table_group_id: 1, table_group_name: "VIP" },
-  { table_group_id: 2, table_group_name: "Regular" },
-  { table_group_id: 3, table_group_name: "Outdoor" },
-];
-
-// 🔹 Simulate logged-in user
-const loggedInUserId = 101;
+import { listTables, addTable, updateTable, deleteTable, listTableGroups } from "../../api/services/tables";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Tables() {
+  const { user } = useContext(AuthContext);
   const [tables, setTables] = useState([]);
+  const [tableGroups, setTableGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [selectedItem, setSelectedItem] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -23,108 +19,140 @@ export default function Tables() {
     table_group_id: "",
     table_name: "",
     table_desc: "",
-    userid: loggedInUserId,
+    userid: user?.userid || "",
   });
 
   const [filterGroupId, setFilterGroupId] = useState(""); // for filter
 
   const userRole = "admin"; // change to 'user' to hide delete
 
-  // ------------------- FETCH TABLES (dummy) -------------------
   useEffect(() => {
-    setTables([
-      {
-        table_id: 1,
-        table_group_id: 1,
-        table_group_name: "VIP",
-        table_name: "Table A1",
-        table_desc: "Near window",
-        userid: 101,
-        table_created_date: "2026-01-01",
-        table_updated_date: "2026-01-02",
-      },
-      {
-        table_id: 2,
-        table_group_id: 2,
-        table_group_name: "Regular",
-        table_name: "Table B1",
-        table_desc: "Center of hall",
-        userid: 102,
-        table_created_date: "2026-01-03",
-        table_updated_date: "2026-01-04",
-      },
-      {
-        table_id: 3,
-        table_group_id: 1,
-        table_group_name: "VIP",
-        table_name: "Table A2",
-        table_desc: "Corner",
-        userid: 101,
-        table_created_date: "2026-01-05",
-        table_updated_date: "2026-01-06",
-      },
-    ]);
+    const fetchData = async () => {
+      try {
+        const [tablesRes, groupsRes] = await Promise.all([
+          listTables(),
+          listTableGroups(),
+        ]);
+        if (tablesRes.status === 'success') setTables(tablesRes.data || []);
+        if (groupsRes.status === 'success') setTableGroups(groupsRes.data || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        Swal.fire('Error', 'Failed to load data', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
-  // ------------------- ADD -------------------
-  const handleAddSave = () => {
-    if (!newItem.table_group_id || !newItem.table_name.trim()) {
-      Swal.fire("Error", "All required fields must be filled!", "error");
-      return;
-    }
-
-    const today = new Date().toISOString().split("T")[0];
-    const groupName = tableGroups.find(g => g.table_group_id === Number(newItem.table_group_id))?.table_group_name;
-
-    const newTable = {
-      table_id: tables.length > 0 ? Math.max(...tables.map(t => t.table_id)) + 1 : 1,
-      table_group_id: Number(newItem.table_group_id),
-      table_group_name: groupName,
-      table_name: newItem.table_name,
-      table_desc: newItem.table_desc,
-      userid: loggedInUserId,
-      table_created_date: today,
-      table_updated_date: today,
-    };
-
-    setTables([...tables, newTable]);
-    Swal.fire("Success", "Table added successfully!", "success");
-
-    setNewItem({ table_group_id: "", table_name: "", table_desc: "", userid: loggedInUserId });
-    setShowAdd(false);
-  };
-
-  // ------------------- EDIT -------------------
-  const openEdit = (item) => { setSelectedItem(item); setShowEdit(true); };
-
-  const handleEditSave = () => {
-    if (!selectedItem.table_group_id || !selectedItem.table_name.trim()) {
-      Swal.fire("Error", "All required fields must be filled!", "error");
-      return;
-    }
-
-    const today = new Date().toISOString().split("T")[0];
-    const groupName = tableGroups.find(g => g.table_group_id === Number(selectedItem.table_group_id))?.table_group_name;
-
-    const updatedTable = { ...selectedItem, table_group_name: groupName, table_updated_date: today };
-
-    setTables(tables.map(t => t.table_id === selectedItem.table_id ? updatedTable : t));
-    Swal.fire("Success", "Table updated successfully!", "success");
-    setShowEdit(false);
-  };
-
-  // ------------------- DELETE -------------------
-  const openDelete = (item) => { setSelectedItem(item); setShowDelete(true); };
-  const handleDelete = () => {
-    setTables(tables.filter(t => t.table_id !== selectedItem.table_id));
-    Swal.fire("Deleted", "Table deleted successfully!", "success");
-    setShowDelete(false);
-  };
-
-  // ------------------- FILTERED TABLES -------------------
+  // Filter tables
   const filteredTables = filterGroupId
-    ? tables.filter(t => t.table_group_id === Number(filterGroupId))
+    ? tables.filter((t) => t.table_group_id === Number(filterGroupId))
     : tables;
+
+  /* ---------- ADD ---------- */
+  const handleAddSave = async () => {
+    if (!newItem.table_name.trim() || !newItem.table_group_id) {
+      Swal.fire("Error", "Name and group are required", "error");
+      return;
+    }
+    if (!user?.userid) {
+      Swal.fire("Error", "User not authenticated", "error");
+      return;
+    }
+    try {
+      const res = await addTable({ ...newItem, userid: user.userid });
+      if (res.status === 'success') {
+        Swal.fire("Success", "Table added successfully", "success");
+        setNewItem({
+          table_group_id: "",
+          table_name: "",
+          table_desc: "",
+          userid: user.userid,
+        });
+        setShowAdd(false);
+        // Refetch
+        const fetchRes = await listTables();
+        if (fetchRes.status === 'success') setTables(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to add table", "error");
+      }
+    } catch (error) {
+      console.error('Error adding table:', error);
+      Swal.fire("Error", "Failed to add table", "error");
+    }
+  };
+
+  /* ---------- EDIT ---------- */
+  const openEdit = (item) => {
+    setSelectedItem(item);
+    setNewItem({
+      table_group_id: item.table_group_id,
+      table_name: item.table_name,
+      table_desc: item.table_desc,
+      userid: item.userid,
+    });
+    setShowEdit(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!newItem.table_name.trim() || !newItem.table_group_id) {
+      Swal.fire("Error", "Name and group are required", "error");
+      return;
+    }
+    try {
+      const res = await updateTable({
+        table_id: selectedItem.table_id,
+        ...newItem,
+      });
+      if (res.status === 'success') {
+        Swal.fire("Success", "Table updated successfully", "success");
+        setShowEdit(false);
+        setSelectedItem(null);
+        setNewItem({
+          table_group_id: "",
+          table_name: "",
+          table_desc: "",
+          userid: user.userid,
+        });
+        // Refetch
+        const fetchRes = await listTables();
+        if (fetchRes.status === 'success') setTables(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to update table", "error");
+      }
+    } catch (error) {
+      console.error('Error updating table:', error);
+      Swal.fire("Error", "Failed to update table", "error");
+    }
+  };
+
+  /* ---------- DELETE ---------- */
+  const openDelete = (item) => {
+    setSelectedItem(item);
+    setShowDelete(true);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const res = await deleteTable(selectedItem.table_id);
+      if (res.status === 'success') {
+        Swal.fire("Success", "Table deleted successfully", "success");
+        setShowDelete(false);
+        setSelectedItem(null);
+        // Refetch
+        const fetchRes = await listTables();
+        if (fetchRes.status === 'success') setTables(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to delete table", "error");
+      }
+    } catch (error) {
+      console.error('Error deleting table:', error);
+      Swal.fire("Error", "Failed to delete table", "error");
+    }
+  };
+
+  if (loading) return <div className="text-center p-4">Loading...</div>;
 
   return (
     <div className="p-6 bg-white rounded shadow">
@@ -173,7 +201,7 @@ export default function Tables() {
               <tr key={t.table_id} className="border-t hover:bg-gray-50">
                 <td className="p-3">{index+1}</td>
                 <td className="p-3 font-medium">{t.table_name}</td>
-                <td className="p-3">{t.table_group_name}</td>
+                <td className="p-3">{tableGroups.find(g => g.table_group_id === t.table_group_id)?.table_group_name || "Unknown"}</td>
                 <td className="p-3">{t.table_desc}</td>
                 <td className="p-3">{t.userid}</td>
                 <td className="p-3 hidden lg:table-cell">{t.table_created_date}</td>
@@ -250,8 +278,8 @@ export default function Tables() {
 
             <select
               className="w-full border p-2 mb-3 rounded"
-              value={selectedItem.table_group_id}
-              onChange={(e) => setSelectedItem({ ...selectedItem, table_group_id: Number(e.target.value) })}
+              value={newItem.table_group_id}
+              onChange={(e) => setNewItem({ ...newItem, table_group_id: Number(e.target.value) })}
             >
               <option value="">Select Table Group</option>
               {tableGroups.map(g => (
@@ -262,15 +290,15 @@ export default function Tables() {
             <input
               type="text"
               className="w-full border p-2 mb-3 rounded"
-              value={selectedItem.table_name}
-              onChange={(e) => setSelectedItem({ ...selectedItem, table_name: e.target.value })}
+              value={newItem.table_name}
+              onChange={(e) => setNewItem({ ...newItem, table_name: e.target.value })}
             />
 
             <input
               type="text"
               className="w-full border p-2 mb-3 rounded"
-              value={selectedItem.table_desc}
-              onChange={(e) => setSelectedItem({ ...selectedItem, table_desc: e.target.value })}
+              value={newItem.table_desc}
+              onChange={(e) => setNewItem({ ...newItem, table_desc: e.target.value })}
             />
 
             <div className="flex justify-end gap-2">

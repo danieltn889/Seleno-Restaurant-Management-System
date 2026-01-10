@@ -1,16 +1,13 @@
 // File: src/pages/tables/TableGroup.jsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { listTableGroups, addTableGroup, updateTableGroup, deleteTableGroup } from "../../api/services/tables.js";
 
 export default function TableGroup() {
-  // 🔹 Dummy data
-  const [groups, setGroups] = useState([
-    { table_group_id: 1, table_group_name: "VIP" },
-    { table_group_id: 2, table_group_name: "Regular" },
-    { table_group_id: 3, table_group_name: "Outdoor" },
-  ]);
+  const [groups, setGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -25,49 +22,98 @@ export default function TableGroup() {
 
   const userRole = "admin"; // change to 'user' to hide delete
 
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
+  const fetchGroups = async () => {
+    try {
+      const res = await listTableGroups();
+      if (res.status === 'success') {
+        setGroups(res.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to load table groups", "error");
+      }
+    } catch (error) {
+      console.error('Error fetching groups:', error);
+      Swal.fire("Error", "Failed to load table groups", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   /* ---------- ADD ---------- */
-  const handleAddSave = () => {
+  const handleAddSave = async () => {
     if (!newItem.table_group_name.trim()) {
       Swal.fire("Error", "Group name is required!", "error");
       return;
     }
 
-    const nextId = groups.length > 0 ? Math.max(...groups.map((g) => g.table_group_id)) + 1 : 1;
-
-    setGroups([...groups, { ...newItem, table_group_id: nextId }]);
-    Swal.fire("Success", "Table group added successfully!", "success");
-
-    setNewItem({ table_group_name: "" });
-    setShowAdd(false);
+    try {
+      const res = await addTableGroup({ table_group_name: newItem.table_group_name });
+      if (res.status === 'success') {
+        Swal.fire("Success", "Table group added successfully!", "success");
+        setNewItem({ table_group_name: "" });
+        setShowAdd(false);
+        fetchGroups(); // refetch
+      } else {
+        Swal.fire("Error", res.message || "Failed to add", "error");
+      }
+    } catch (error) {
+      console.error('Error adding:', error);
+      Swal.fire("Error", "Failed to add", "error");
+    }
   };
 
   /* ---------- EDIT ---------- */
   const openEdit = (item) => { setSelectedItem(item); setShowEdit(true); };
 
-  const handleEditSave = () => {
+  const handleEditSave = async () => {
     if (!selectedItem.table_group_name.trim()) {
       Swal.fire("Error", "Group name is required!", "error");
       return;
     }
 
-    setGroups(groups.map((g) => g.table_group_id === selectedItem.table_group_id ? selectedItem : g));
-    Swal.fire("Success", "Table group updated successfully!", "success");
-    setShowEdit(false);
+    try {
+      const res = await updateTableGroup(selectedItem.table_group_id, { table_group_name: selectedItem.table_group_name });
+      if (res.status === 'success') {
+        Swal.fire("Success", "Table group updated successfully!", "success");
+        setShowEdit(false);
+        fetchGroups(); // refetch
+      } else {
+        Swal.fire("Error", res.message || "Failed to update", "error");
+      }
+    } catch (error) {
+      console.error('Error updating:', error);
+      Swal.fire("Error", "Failed to update", "error");
+    }
   };
 
   /* ---------- DELETE ---------- */
   const openDelete = (item) => { setSelectedItem(item); setShowDelete(true); };
 
-  const handleDelete = () => {
-    setGroups(groups.filter((g) => g.table_group_id !== selectedItem.table_group_id));
-    Swal.fire("Deleted", "Table group deleted successfully!", "success");
-    setShowDelete(false);
+  const handleDelete = async () => {
+    try {
+      const res = await deleteTableGroup(selectedItem.table_group_id);
+      if (res.status === 'success') {
+        Swal.fire("Deleted", "Table group deleted successfully!", "success");
+        setShowDelete(false);
+        fetchGroups(); // refetch
+      } else {
+        Swal.fire("Error", res.message || "Failed to delete", "error");
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+      Swal.fire("Error", "Failed to delete", "error");
+    }
   };
 
   /* ---------- FILTER ---------- */
   const filteredGroups = groups.filter((g) =>
     g.table_group_name.toLowerCase().includes(filterText.toLowerCase())
   );
+
+  if (loading) return <div className="p-6 text-center">Loading...</div>;
 
   return (
     <div className="p-6 bg-white rounded shadow">

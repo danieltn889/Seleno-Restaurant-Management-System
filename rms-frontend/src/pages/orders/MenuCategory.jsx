@@ -1,13 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { listMenuCategories } from "../../api/services/menu";
 
 export default function MenuCategory({ category, setCategory }) {
-  // Dummy menu categories (Restaurant, Bar, Coffee)
-  const [categories] = useState([
-    "Restaurant",
-    "Bar",
-    "Coffee",
-    "Dessert",
-  ]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await listMenuCategories();
+        if (res.status === 'success') {
+          setCategories(res.data.map(cat => cat.menu_cat_name));
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  if (loading) return <div className="text-center p-2">Loading categories...</div>;
 
   return (
     <div className="bg-white p-4 rounded-lg shadow">

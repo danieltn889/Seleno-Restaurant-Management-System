@@ -5,6 +5,7 @@ use Models\Menu;
 use Models\MenuCategory;
 use Models\MenuCategoryGroup;
 use Models\MenuItem;
+use PDO;
 
 class MenuController extends BaseController {
     private $menuModel;
@@ -48,7 +49,7 @@ class MenuController extends BaseController {
     public function addMenuCategory($params = []) {
         $requestData = json_decode(file_get_contents('php://input'), true);
         
-        $required = ['menu_cat_group_id', 'name'];
+        $required = ['menu_cat_group_id', 'menu_cat_name'];
         foreach ($required as $field) {
             if (empty($requestData[$field])) {
                 return $this->error("The field '$field' is required and cannot be empty");
@@ -64,8 +65,8 @@ class MenuController extends BaseController {
         // Map fields
         $data = [
             'menu_cat_group_id' => $requestData['menu_cat_group_id'],
-            'menu_cat_name' => $requestData['name'],
-            'menu_cat_desc' => $requestData['desc'] ?? null
+            'menu_cat_name' => $requestData['menu_cat_name'],
+            'menu_cat_desc' => $requestData['menu_cat_desc'] ?? null
         ];
         
         $model = new MenuCategory();
@@ -167,5 +168,57 @@ class MenuController extends BaseController {
         $model = new MenuItem();
         $id = $model->create($requestData);
         return $id ? $this->success('Menu item added') : $this->error('Failed to add menu item');
+    }
+
+    public function listMenuItems($params = []) {
+        $model = new MenuItem();
+        $query = "SELECT mi.*, s.stock_name, s.stock_qty as quantity, m.menu_name, m.menu_price, mc.menu_cat_name as category
+                  FROM menu_item mi
+                  LEFT JOIN stock s ON mi.stock_id = s.stock_id
+                  LEFT JOIN menu m ON mi.menu_id = m.menu_id
+                  LEFT JOIN menu_category mc ON m.menu_cat_id = mc.menu_cat_id
+                  ORDER BY mi.menu_item_created_date DESC";
+        $stmt = $model->getDb()->prepare($query);
+        $stmt->execute();
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->success('Menu items listed', $data);
+    }
+
+    public function updateMenuItem($params = []) {
+        $requestData = json_decode(file_get_contents('php://input'), true);
+
+        if (empty($requestData['menu_item_id'])) {
+            return $this->error('Menu item ID is required');
+        }
+
+        $model = new MenuItem();
+        $existing = $model->find($requestData['menu_item_id']);
+        if (!$existing) {
+            return $this->error('Menu item not found');
+        }
+
+        if (isset($requestData['menu_id'])) {
+            $menuModel = new Menu();
+            if (!$menuModel->find($requestData['menu_id'])) {
+                return $this->error('Menu not found');
+            }
+        }
+
+        if (isset($requestData['stock_id'])) {
+            $stockModel = new \Models\Stock();
+            if (!$stockModel->find($requestData['stock_id'])) {
+                return $this->error('Stock not found');
+            }
+        }
+
+        $success = $model->update($requestData['menu_item_id'], $requestData);
+        return $success ? $this->success('Menu item updated') : $this->error('Failed to update menu item');
+    }
+
+    public function deleteMenuItem($params = []) {
+        $menu_item_id = $_GET['id'];
+        $model = new MenuItem();
+        $success = $model->delete($menu_item_id);
+        return $success ? $this->success('Menu item deleted') : $this->error('Failed to delete menu item');
     }
 }

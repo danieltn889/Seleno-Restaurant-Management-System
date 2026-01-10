@@ -1,47 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilePdf } from "react-icons/fa";
 import Swal from "sweetalert2";
 import jsPDF from "jspdf";
+import { listMenus, listMenuCategories, addMenu as apiAddMenu, updateMenu as apiUpdateMenu, deleteMenu as apiDeleteMenu } from "../../api/services/menu";
 
 export default function Menu() {
-  // 🔹 Dummy menu categories
-  const [categories] = useState([
-    { menu_cat_id: 1, menu_cat_name: "Cold Starter" },
-    { menu_cat_id: 2, menu_cat_name: "Snacks" },
-    { menu_cat_id: 3, menu_cat_name: "Drinks" },
-  ]);
-
-  // 🔹 Dummy menu items
-  const [menu, setMenu] = useState([
-    {
-      menu_id: 1,
-      menu_name: "Sereno Chef Salad",
-      menu_price: 6000,
-      menu_desc:
-        "lettuce, onion, carrots, eggs, avocado, fried chicken, ham & cheese",
-      menu_cat_id: 1,
-      menu_status: "available",
-    },
-    {
-      menu_id: 2,
-      menu_name: "Chicken Caesar Salad",
-      menu_price: 6000,
-      menu_desc: "chicken slice, lettuce, onion, crotons, tomatoes, cheese",
-      menu_cat_id: 1,
-      menu_status: "unavailable",
-    },
-    {
-      menu_id: 3,
-      menu_name: "Sambaza Platter with Chips & Tartar Sauce",
-      menu_price: 4000,
-      menu_desc: "",
-      menu_cat_id: 2,
-      menu_status: "available",
-    },
-  ]);
-
+  const [categories, setCategories] = useState([]);
+  const [menu, setMenu] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [catRes, menuRes] = await Promise.all([listMenuCategories(), listMenus()]);
+        if (catRes.status === 'success') setCategories(catRes.data || []);
+        if (menuRes.status === 'success') setMenu(menuRes.data || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        Swal.fire('Error', 'Failed to load data', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // 🔍 Filter menu by search & category
   const filteredMenu = menu.filter((m) => {
@@ -99,19 +83,22 @@ export default function Menu() {
       return;
     }
 
-    setMenu((prev) => [
-      ...prev,
-      {
-        menu_id: Date.now(),
-        menu_name: value.name,
-        menu_price: Number(value.price),
-        menu_desc: value.desc,
-        menu_cat_id: Number(value.category),
-        menu_status: value.status,
-      },
-    ]);
+    const response = await apiAddMenu({
+      menu_name: value.name,
+      menu_price: Number(value.price),
+      menu_desc: value.desc,
+      menu_cat_id: Number(value.category),
+      menu_status: value.status,
+    });
 
-    Swal.fire("Added!", "Menu item created", "success");
+    if (response.status === 'success') {
+      Swal.fire("Added!", "Menu item created", "success");
+      // Refetch menus
+      const menuRes = await listMenus();
+      if (menuRes.status === 'success') setMenu(menuRes.data || []);
+    } else {
+      Swal.fire("Error", response.message || "Failed to add menu", "error");
+    }
   };
 
   // 🔹 EDIT MENU
@@ -160,37 +147,46 @@ export default function Menu() {
       return;
     }
 
-    setMenu((prev) =>
-      prev.map((m) =>
-        m.menu_id === item.menu_id
-          ? {
-              ...m,
-              menu_name: value.name,
-              menu_price: Number(value.price),
-              menu_desc: value.desc,
-              menu_cat_id: Number(value.category),
-              menu_status: value.status,
-            }
-          : m
-      )
-    );
+    const response = await apiUpdateMenu({
+      menu_id: item.menu_id,
+      menu_name: value.name,
+      menu_price: Number(value.price),
+      menu_desc: value.desc,
+      menu_cat_id: Number(value.category),
+      menu_status: value.status,
+    });
 
-    Swal.fire("Updated!", "Menu item updated", "success");
+    if (response.status === 'success') {
+      Swal.fire("Updated!", "Menu item updated", "success");
+      // Refetch menus
+      const menuRes = await listMenus();
+      if (menuRes.status === 'success') setMenu(menuRes.data || []);
+    } else {
+      Swal.fire("Error", response.message || "Failed to update menu", "error");
+    }
   };
 
   // 🔹 DELETE MENU
-  const deleteMenu = (id) => {
-    Swal.fire({
+  const deleteMenuItem = async (id) => {
+    const result = await Swal.fire({
       title: "Delete this menu item?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
-    }).then((res) => {
-      if (res.isConfirmed) {
-        setMenu((prev) => prev.filter((m) => m.menu_id !== id));
-        Swal.fire("Deleted!", "Menu item removed", "success");
-      }
     });
+
+    if (!result.isConfirmed) return;
+
+    const response = await apiDeleteMenu(id);
+
+    if (response.status === 'success') {
+      Swal.fire("Deleted!", "Menu item removed", "success");
+      // Refetch menus
+      const menuRes = await listMenus();
+      if (menuRes.status === 'success') setMenu(menuRes.data || []);
+    } else {
+      Swal.fire("Error", response.message || "Failed to delete menu", "error");
+    }
   };
 
   // 🔹 PDF Export (Two Columns)
@@ -282,116 +278,174 @@ const exportPDF = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-        <h2 className="text-3xl font-bold text-gray-800">Menu Management</h2>
+      {loading ? (
+        <div className="text-center">Loading...</div>
+      ) : (
+        <>
+          {/* Header */}
+          <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+            <h2 className="text-3xl font-bold text-gray-800">Menu Management</h2>
 
-        <div className="flex flex-wrap gap-3">
-          {/* Category Filter */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="border rounded-lg px-3 py-2"
-          >
-            <option value="">All Categories</option>
-            {categories.map((c) => (
-              <option key={c.menu_cat_id} value={c.menu_cat_id}>
-                {c.menu_cat_name}
-              </option>
-            ))}
-          </select>
+            <div className="flex flex-wrap gap-3">
+              {/* Category Filter */}
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="border rounded-lg px-3 py-2"
+              >
+                <option value="">All Categories</option>
+                {categories.map((c) => (
+                  <option key={c.menu_cat_id} value={c.menu_cat_id}>
+                    {c.menu_cat_name}
+                  </option>
+                ))}
+              </select>
 
-          {/* Search */}
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-3 text-gray-400" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search menu..."
-              className="pl-10 pr-4 py-2 border rounded-lg"
-            />
+              {/* Search */}
+              <div className="relative">
+                <FaSearch className="absolute left-3 top-3 text-gray-400" />
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search menu..."
+                  className="pl-10 pr-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* PDF Button */}
+              <button
+                onClick={exportPDF}
+                className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded shadow"
+              >
+                <FaFilePdf /> PDF
+              </button>
+
+              {/* Add Button */}
+              <button
+                onClick={addMenu}
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded shadow"
+              >
+                <FaPlus /> Add
+              </button>
+            </div>
           </div>
 
-          {/* PDF Button */}
-          <button
-            onClick={exportPDF}
-            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded shadow"
-          >
-            <FaFilePdf /> PDF
-          </button>
-
-          {/* Add Button */}
-          <button
-            onClick={addMenu}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded shadow"
-          >
-            <FaPlus /> Add
-          </button>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-3 text-left">#</th>
-              <th className="p-3 text-left">Menu</th>
-              <th className="p-3 text-left">Category</th>
-              <th className="p-3 text-left">Price</th>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Description</th>
-              <th className="p-3 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredMenu.length === 0 ? (
-              <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-500">
-                  No menu items found
-                </td>
-              </tr>
-            ) : (
-              filteredMenu.map((m, i) => (
-                <tr key={m.menu_id} className="border-t hover:bg-gray-50">
-                  <td className="p-3">{i + 1}</td>
-                  <td className="p-3 font-medium">{m.menu_name}</td>
-                  <td className="p-3">{getCategoryName(m.menu_cat_id)}</td>
-                  <td className="p-3">{m.menu_price.toLocaleString()} RWF</td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-white ${
-                        m.menu_status === "available"
-                          ? "bg-green-500"
-                          : "bg-gray-400"
-                      } text-sm`}
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4 mb-6">
+            {filteredMenu.map((m, index) => (
+              <div key={m.menu_id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-gray-800">{m.menu_name}</h3>
+                    <p className="text-sm text-gray-500">Category: {getCategoryName(m.menu_cat_id)}</p>
+                    <p className="text-sm font-medium text-green-600">${m.menu_price}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => editMenu(m)}
+                      className="text-yellow-500 hover:text-yellow-600 p-2"
+                      title="Edit"
                     >
-                      {m.menu_status}
-                    </span>
-                  </td>
-                  <td className="p-3">{m.menu_desc}</td>
-                  <td className="p-3 text-center">
-                    <div className="flex justify-center gap-3">
-                      <button
-                        onClick={() => editMenu(m)}
-                        className="text-yellow-500"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        onClick={() => deleteMenu(m.menu_id)}
-                        className="text-red-500"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  </td>
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => deleteMenu(m.menu_id)}
+                      className="text-red-500 hover:text-red-600 p-2"
+                      title="Delete"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center mb-3">
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      m.menu_status === "available"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {m.menu_status}
+                  </span>
+                  <span className="text-xs text-gray-500">#{index + 1}</span>
+                </div>
+                {m.menu_desc && (
+                  <p className="text-sm text-gray-600 mb-3">{m.menu_desc}</p>
+                )}
+                <div className="space-y-1 text-xs text-gray-500">
+                  <p>Created: {m.menu_created_date}</p>
+                  {m.menu_updated_date && (
+                    <p>Updated: {m.menu_updated_date}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block bg-white rounded-lg shadow overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="p-3 text-left">#</th>
+                  <th className="p-3 text-left">Menu</th>
+                  <th className="p-3 text-left">Category</th>
+                  <th className="p-3 text-left">Price</th>
+                  <th className="p-3 text-left">Status</th>
+                  <th className="p-3 text-left">Description</th>
+                  <th className="p-3 text-center">Actions</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {filteredMenu.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="p-4 text-center text-gray-500">
+                      No menu items found
+                    </td>
+                  </tr>
+                ) : (
+                  filteredMenu.map((m, i) => (
+                    <tr key={m.menu_id} className="border-t hover:bg-gray-50">
+                      <td className="p-3">{i + 1}</td>
+                      <td className="p-3 font-medium">{m.menu_name}</td>
+                      <td className="p-3">{getCategoryName(m.menu_cat_id)}</td>
+                      <td className="p-3">{m.menu_price.toLocaleString()} RWF</td>
+                      <td className="p-3">
+                        <span
+                          className={`px-2 py-1 rounded-full text-white ${
+                            m.menu_status === "available"
+                              ? "bg-green-500"
+                              : "bg-gray-400"
+                          } text-sm`}
+                        >
+                          {m.menu_status}
+                        </span>
+                      </td>
+                      <td className="p-3">{m.menu_desc}</td>
+                      <td className="p-3 text-center">
+                        <div className="flex justify-center gap-3">
+                          <button
+                            onClick={() => editMenu(m)}
+                            className="text-yellow-500"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            onClick={() => deleteMenuItem(m.menu_id)}
+                            className="text-red-500"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -1,37 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
-
-// Dummy categories for FK
-const dummyCategories = [
-  { stock_item_cat_id: 1, Stock_item_cat_name: "Tomatoes" },
-  { stock_item_cat_id: 2, Stock_item_cat_name: "Rice" },
-  { stock_item_cat_id: 3, Stock_item_cat_name: "Potatoes" },
-];
+import { listStocks, addStock, updateStock, deleteStock, listStockItemCategories } from "../../api/services/inventory";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Stocks() {
-  const [stocks, setStocks] = useState([
-    {
-      stock_id: 1,
-      stock_item_cat_id: 1,
-      stock_name: "Cherry Tomatoes",
-      stock_desc: "Small fresh tomatoes",
-      stock_status: "active",
-      stock_qty: 120,
-      stock_created_date: "2026-01-01",
-      stock_updated_date: "2026-01-03",
-    },
-    {
-      stock_id: 2,
-      stock_item_cat_id: 2,
-      stock_name: "Basmati Rice",
-      stock_desc: "Imported premium rice",
-      stock_status: "inactive",
-      stock_qty: 50,
-      stock_created_date: "2026-01-02",
-      stock_updated_date: "2026-01-04",
-    },
-  ]);
+  const { user } = useContext(AuthContext);
+  const [stocks, setStocks] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [selectedStock, setSelectedStock] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -42,62 +19,105 @@ export default function Stocks() {
     stock_item_cat_id: "",
     stock_name: "",
     stock_desc: "",
-    stock_status: "active",
+    stock_status: "available",
     stock_qty: 0,
   });
 
   const userRole = "admin"; // only admin can delete
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [stocksRes, catsRes] = await Promise.all([
+          listStocks(),
+          listStockItemCategories(),
+        ]);
+        if (stocksRes.status === 'success') setStocks(stocksRes.data || []);
+        if (catsRes.status === 'success') setCategories(catsRes.data || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        Swal.fire('Error', 'Failed to load data', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   /* ---------- ADD ---------- */
-  const handleAddSave = () => {
-    if (!newStock.stock_name.trim()) return;
-
-    const nextId =
-      stocks.length > 0 ? Math.max(...stocks.map((s) => s.stock_id)) + 1 : 1;
-    const today = new Date().toISOString().split("T")[0];
-
-    setStocks([
-      ...stocks,
-      {
-        ...newStock,
-        stock_id: nextId,
-        stock_created_date: today,
-        stock_updated_date: today,
-      },
-    ]);
-
-    Swal.fire("Success", "Stock added successfully!", "success");
-
-    setNewStock({
-      stock_item_cat_id: "",
-      stock_name: "",
-      stock_desc: "",
-      stock_status: "active",
-      stock_qty: 0,
-    });
-
-    setShowAdd(false);
+  const handleAddSave = async () => {
+    if (!newStock.stock_name.trim() || !newStock.stock_item_cat_id) {
+      Swal.fire("Error", "Name and category are required", "error");
+      return;
+    }
+    try {
+      const res = await addStock(newStock);
+      if (res.status === 'success') {
+        Swal.fire("Success", "Stock added successfully", "success");
+        setNewStock({
+          stock_item_cat_id: "",
+          stock_name: "",
+          stock_desc: "",
+          stock_status: "available",
+          stock_qty: 0,
+        });
+        setShowAdd(false);
+        // Refetch
+        const fetchRes = await listStocks();
+        if (fetchRes.status === 'success') setStocks(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to add stock", "error");
+      }
+    } catch (error) {
+      console.error('Error adding stock:', error);
+      Swal.fire("Error", "Failed to add stock", "error");
+    }
   };
 
   /* ---------- EDIT ---------- */
   const openEdit = (stock) => {
     setSelectedStock(stock);
+    setNewStock({
+      stock_item_cat_id: stock.stock_item_cat_id,
+      stock_name: stock.stock_name,
+      stock_desc: stock.stock_desc,
+      stock_status: stock.stock_status,
+      stock_qty: stock.stock_qty,
+    });
     setShowEdit(true);
   };
 
-  const handleEditSave = () => {
-    const today = new Date().toISOString().split("T")[0];
-
-    setStocks(
-      stocks.map((s) =>
-        s.stock_id === selectedStock.stock_id
-          ? { ...selectedStock, stock_updated_date: today }
-          : s
-      )
-    );
-
-    Swal.fire("Success", "Stock updated successfully!", "success");
-    setShowEdit(false);
+  const handleEditSave = async () => {
+    if (!newStock.stock_name.trim() || !newStock.stock_item_cat_id) {
+      Swal.fire("Error", "Name and category are required", "error");
+      return;
+    }
+    try {
+      const res = await updateStock({
+        stock_id: selectedStock.stock_id,
+        ...newStock,
+      });
+      if (res.status === 'success') {
+        Swal.fire("Success", "Stock updated successfully", "success");
+        setShowEdit(false);
+        setSelectedStock(null);
+        setNewStock({
+          stock_item_cat_id: "",
+          stock_name: "",
+          stock_desc: "",
+          stock_status: "available",
+          stock_qty: 0,
+        });
+        // Refetch
+        const fetchRes = await listStocks();
+        if (fetchRes.status === 'success') setStocks(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to update stock", "error");
+      }
+    } catch (error) {
+      console.error('Error updating stock:', error);
+      Swal.fire("Error", "Failed to update stock", "error");
+    }
   };
 
   /* ---------- DELETE ---------- */
@@ -106,19 +126,32 @@ export default function Stocks() {
     setShowDelete(true);
   };
 
-  const handleDelete = () => {
-    setStocks(stocks.filter((s) => s.stock_id !== selectedStock.stock_id));
-    Swal.fire("Deleted", "Stock deleted successfully!", "success");
-    setShowDelete(false);
+  const handleDelete = async () => {
+    try {
+      const res = await deleteStock(selectedStock.stock_id);
+      if (res.status === 'success') {
+        Swal.fire("Success", "Stock deleted successfully", "success");
+        setShowDelete(false);
+        setSelectedStock(null);
+        // Refetch
+        const fetchRes = await listStocks();
+        if (fetchRes.status === 'success') setStocks(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to delete stock", "error");
+      }
+    } catch (error) {
+      console.error('Error deleting stock:', error);
+      Swal.fire("Error", "Failed to delete stock", "error");
+    }
   };
 
   /* Helper: Get Category Name */
   const getCategoryName = (catId) => {
-    const cat = dummyCategories.find((c) => c.stock_item_cat_id === catId);
-    return cat ? cat.Stock_item_cat_name : "N/A";
+    const cat = categories.find(c => c.stock_item_cat_id === catId);
+    return cat ? cat.stock_item_cat_name : "Unknown";
   };
 
-  return (
+  return loading ? <div className="text-center p-4">Loading...</div> : (
     <div className="p-6 bg-white rounded shadow">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -131,8 +164,57 @@ export default function Stocks() {
         </button>
       </div>
 
-      {/* Responsive Table */}
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {stocks.map((s, index) => (
+          <div key={s.stock_id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <h3 className="font-semibold text-gray-800">{s.stock_name}</h3>
+                <p className="text-sm text-gray-500">#{index + 1}</p>
+              </div>
+              <span
+                className={`px-2 py-1 text-xs rounded-full text-white font-medium ${
+                  s.stock_status === "active" ? "bg-green-500" : "bg-gray-500"
+                }`}
+              >
+                {s.stock_status}
+              </span>
+            </div>
+            <div className="space-y-2 text-sm text-gray-600 mb-3">
+              <p><span className="font-medium">Category:</span> {getCategoryName(s.stock_item_cat_id)}</p>
+              <p><span className="font-medium">Quantity:</span> {s.stock_qty}</p>
+              {s.stock_desc && <p><span className="font-medium">Description:</span> {s.stock_desc}</p>}
+              <p><span className="font-medium">Created:</span> {s.stock_created_date}</p>
+              <p><span className="font-medium">Updated:</span> {s.stock_updated_date}</p>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => openEdit(s)}
+                className="text-yellow-500 hover:text-yellow-700 transition p-2"
+              >
+                <FaEdit />
+              </button>
+              {userRole === "admin" && (
+                <button
+                  onClick={() => openDelete(s)}
+                  className="text-red-500 hover:text-red-700 transition p-2"
+                >
+                  <FaTrash />
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+        {stocks.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            No stocks found
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full border text-left">
           <thead className="bg-gray-100">
             <tr>
@@ -155,7 +237,7 @@ export default function Stocks() {
                 <td className="p-3">
                   <span
                     className={`px-2 py-1 text-sm rounded-full text-white ${
-                      s.stock_status === "active" ? "bg-green-500" : "bg-gray-500"
+                      s.stock_status === "available" ? "bg-green-500" : "bg-gray-500"
                     }`}
                   >
                     {s.stock_status}
@@ -209,9 +291,9 @@ export default function Stocks() {
               }
             >
               <option value="">Select Category</option>
-              {dummyCategories.map((c) => (
+              {categories.map((c) => (
                 <option key={c.stock_item_cat_id} value={c.stock_item_cat_id}>
-                  {c.Stock_item_cat_name}
+                  {c.stock_item_cat_name}
                 </option>
               ))}
             </select>
@@ -241,8 +323,8 @@ export default function Stocks() {
               value={newStock.stock_status}
               onChange={(e) => setNewStock({ ...newStock, stock_status: e.target.value })}
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value="available">Available</option>
+              <option value="unavailable">Unavailable</option>
             </select>
 
             <div className="flex justify-end gap-2">
@@ -265,17 +347,17 @@ export default function Stocks() {
 
             <select
               className="w-full border p-2 mb-3 rounded"
-              value={selectedStock.stock_item_cat_id}
+              value={newStock.stock_item_cat_id}
               onChange={(e) =>
-                setSelectedStock({
-                  ...selectedStock,
+                setNewStock({
+                  ...newStock,
                   stock_item_cat_id: parseInt(e.target.value),
                 })
               }
             >
-              {dummyCategories.map((c) => (
+              {categories.map((c) => (
                 <option key={c.stock_item_cat_id} value={c.stock_item_cat_id}>
-                  {c.Stock_item_cat_name}
+                  {c.stock_item_cat_name}
                 </option>
               ))}
             </select>
@@ -283,27 +365,27 @@ export default function Stocks() {
             <input
               type="text"
               className="w-full border p-2 mb-3 rounded"
-              value={selectedStock.stock_name}
-              onChange={(e) => setSelectedStock({ ...selectedStock, stock_name: e.target.value })}
+              value={newStock.stock_name}
+              onChange={(e) => setNewStock({ ...newStock, stock_name: e.target.value })}
             />
             <textarea
               className="w-full border p-2 mb-3 rounded"
-              value={selectedStock.stock_desc}
-              onChange={(e) => setSelectedStock({ ...selectedStock, stock_desc: e.target.value })}
+              value={newStock.stock_desc}
+              onChange={(e) => setNewStock({ ...newStock, stock_desc: e.target.value })}
             />
             <input
               type="number"
               className="w-full border p-2 mb-3 rounded"
-              value={selectedStock.stock_qty}
-              onChange={(e) => setSelectedStock({ ...selectedStock, stock_qty: parseInt(e.target.value) })}
+              value={newStock.stock_qty}
+              onChange={(e) => setNewStock({ ...newStock, stock_qty: parseInt(e.target.value) })}
             />
             <select
               className="w-full border p-2 mb-4 rounded"
-              value={selectedStock.stock_status}
-              onChange={(e) => setSelectedStock({ ...selectedStock, stock_status: e.target.value })}
+              value={newStock.stock_status}
+              onChange={(e) => setNewStock({ ...newStock, stock_status: e.target.value })}
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value="available">Available</option>
+              <option value="unavailable">Unavailable</option>
             </select>
 
             <div className="flex justify-end gap-2">

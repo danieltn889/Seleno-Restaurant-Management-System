@@ -1,54 +1,27 @@
 import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
-
-const dummyOrders = [
-  {
-    order_id: 1,
-    order_code: "ORD-001",
-    table_id: "Table 1",
-    userid: "John Doe",
-    order_type: "Restaurant",
-    order_status: "PENDING",
-    created_at: "2026-01-05 10:00",
-    updated_at: "2026-01-05 10:05",
-    items: [
-      { name: "Burger", qty: 2, price: 5000 },
-      { name: "Coke", qty: 1, price: 1000 },
-    ],
-  },
-  {
-    order_id: 2,
-    order_code: "ORD-002",
-    table_id: "Table 2",
-    userid: "Jane Smith",
-    order_type: "Bar",
-    order_status: "APPROVED",
-    created_at: "2026-01-06 12:00",
-    updated_at: "2026-01-06 12:05",
-    items: [{ name: "Beer", qty: 3, price: 3000 }],
-  },
-  {
-    order_id: 3,
-    order_code: "ORD-003",
-    table_id: "Table 3",
-    userid: "Alice",
-    order_type: "Coffee",
-    order_status: "APPROVED",
-    created_at: "2026-01-07 14:00",
-    updated_at: "2026-01-07 14:05",
-    items: [{ name: "Latte", qty: 1, price: 2000 }],
-  },
-];
+import { listOrders } from "../../api/services/orders";
 
 export default function OrdersReport() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [userFilter, setUserFilter] = useState("ALL");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
-    setOrders(dummyOrders);
+    const fetchData = async () => {
+      try {
+        const res = await listOrders();
+        if (res.status === 'success') setOrders(res.data || []);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   // Unique users for filter
@@ -141,103 +114,109 @@ export default function OrdersReport() {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4 text-center">Orders Report</h1>
+      {loading ? (
+        <div className="text-center">Loading...</div>
+      ) : (
+        <>
+          <h1 className="text-2xl font-bold mb-4 text-center">Orders Report</h1>
 
-      {/* Filters */}
-      <div className="mb-4 flex flex-wrap gap-3 items-center bg-white p-4 rounded shadow">
-        <label className="font-semibold">Status:</label>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="border rounded px-2 py-1"
-        >
-          <option value="ALL">ALL</option>
-          <option value="PENDING">PENDING</option>
-          <option value="APPROVED">APPROVED</option>
-          <option value="CANCELLED">CANCELLED</option>
-        </select>
+          {/* Filters */}
+          <div className="mb-4 flex flex-wrap gap-3 items-center bg-white p-4 rounded shadow">
+            <label className="font-semibold">Status:</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border rounded px-2 py-1"
+            >
+              <option value="ALL">ALL</option>
+              <option value="PENDING">PENDING</option>
+              <option value="APPROVED">APPROVED</option>
+              <option value="CANCELLED">CANCELLED</option>
+            </select>
 
-        <label className="font-semibold">User:</label>
-        <select
-          value={userFilter}
-          onChange={(e) => setUserFilter(e.target.value)}
-          className="border rounded px-2 py-1"
-        >
-          {users.map((u) => (
-            <option key={u} value={u}>{u}</option>
-          ))}
-        </select>
+            <label className="font-semibold">User:</label>
+            <select
+              value={userFilter}
+              onChange={(e) => setUserFilter(e.target.value)}
+              className="border rounded px-2 py-1"
+            >
+              {users.map((u) => (
+                <option key={u} value={u}>{u}</option>
+              ))}
+            </select>
 
-        <label className="font-semibold">From:</label>
-        <input
-          type="date"
-          value={dateFrom}
-          onChange={(e) => setDateFrom(e.target.value)}
-          className="border rounded px-2 py-1"
-        />
+            <label className="font-semibold">From:</label>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="border rounded px-2 py-1"
+            />
 
-        <label className="font-semibold">To:</label>
-        <input
-          type="date"
-          value={dateTo}
-          onChange={(e) => setDateTo(e.target.value)}
-          className="border rounded px-2 py-1"
-        />
+            <label className="font-semibold">To:</label>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="border rounded px-2 py-1"
+            />
 
-        <button
-          onClick={exportPDF}
-          className="ml-auto bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
-        >
-          Export PDF
-        </button>
-      </div>
+            <button
+              onClick={exportPDF}
+              className="ml-auto bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
+            >
+              Export PDF
+            </button>
+          </div>
 
-      {/* Orders Table */}
-      <div className="overflow-x-auto bg-white rounded shadow mt-4">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Order ID</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Code</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Table</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">User</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Total (RWF)</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {filteredOrders.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="px-4 py-2 text-center text-gray-500">
-                  No orders found
-                </td>
-              </tr>
-            ) : (
-              filteredOrders.map((order) => {
-                const total = order.items.reduce((sum, i) => sum + i.qty * i.price, 0);
-                return (
-                  <tr key={order.order_id} className="hover:bg-gray-50">
-                    <td className="px-4 py-2">{order.order_id}</td>
-                    <td className="px-4 py-2">{order.order_code}</td>
-                    <td className="px-4 py-2">{order.table_id}</td>
-                    <td className="px-4 py-2">{order.userid}</td>
-                    <td className={`px-4 py-2 w-24 text-center rounded ${statusBadge(order.order_status)}`}>
-                      {order.order_status}
+          {/* Orders Table */}
+          <div className="overflow-x-auto bg-white rounded shadow mt-4">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Order ID</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Code</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Table</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">User</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Total (RWF)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-4 py-2 text-center text-gray-500">
+                      No orders found
                     </td>
-                    <td className="px-4 py-2">{total}</td>
                   </tr>
-                );
-              })
-            )}
-          </tbody>
-          <tfoot className="bg-gray-100 font-semibold">
-            <tr>
-              <td colSpan="5" className="px-4 py-2 text-right">Overall Total</td>
-              <td className="px-4 py-2">{overallTotal} RWF</td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+                ) : (
+                  filteredOrders.map((order) => {
+                    const total = order.items.reduce((sum, i) => sum + i.qty * i.price, 0);
+                    return (
+                      <tr key={order.order_id} className="hover:bg-gray-50">
+                        <td className="px-4 py-2">{order.order_id}</td>
+                        <td className="px-4 py-2">{order.order_code}</td>
+                        <td className="px-4 py-2">{order.table_id}</td>
+                        <td className="px-4 py-2">{order.userid}</td>
+                        <td className={`px-4 py-2 w-24 text-center rounded ${statusBadge(order.order_status)}`}>
+                          {order.order_status}
+                        </td>
+                        <td className="px-4 py-2">{total}</td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+              <tfoot className="bg-gray-100 font-semibold">
+                <tr>
+                  <td colSpan="5" className="px-4 py-2 text-right">Overall Total</td>
+                  <td className="px-4 py-2">{overallTotal} RWF</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }

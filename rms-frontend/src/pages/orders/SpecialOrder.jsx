@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { AuthContext } from "../../context/AuthContext";
+import { listSpecialOrders, addSpecialOrder, updateSpecialOrder, deleteSpecialOrder } from "../../api/services/orders";
 
 export default function SpecialOrder() {
-  // Simulated logged-in user ID
-  const loggedInUserId = 1; // <-- replace with real user ID from auth
-
-  // 🔹 Dummy data for special orders
+  const { user } = useContext(AuthContext);
   const [specialOrders, setSpecialOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Modal states
   const [showAdd, setShowAdd] = useState(false);
@@ -25,90 +25,111 @@ export default function SpecialOrder() {
 
   const userRole = "admin"; // change to "user" to hide delete
 
-  // ------------------- INIT DUMMY DATA -------------------
+  // ------------------- INIT DATA -------------------
   useEffect(() => {
-    setSpecialOrders([
-      {
-        special_order_id: 1,
-        special_order_name: "Chef Special Pizza",
-        special_order_desc: "Extra cheese, pepperoni",
-        special_order_price: 12000,
-        special_order_status: "active",
-        userid: 1,
-      },
-      {
-        special_order_id: 2,
-        special_order_name: "Grilled Salmon",
-        special_order_desc: "Served with veggies",
-        special_order_price: 18000,
-        special_order_status: "active",
-        userid: 1,
-      },
-      {
-        special_order_id: 3,
-        special_order_name: "Chocolate Lava Cake",
-        special_order_desc: "Warm and gooey",
-        special_order_price: 6000,
-        special_order_status: "inactive",
-        userid: 2,
-      },
-    ]);
+    const fetchSpecialOrders = async () => {
+      try {
+        const res = await listSpecialOrders();
+        if (res.status === 'success') {
+          setSpecialOrders(res.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching special orders:', error);
+        Swal.fire('Error', 'Failed to load special orders', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSpecialOrders();
   }, []);
 
   // ------------------- ADD -------------------
-  const handleAddSave = () => {
+  const handleAddSave = async () => {
     if (!newItem.special_order_name.trim() || !newItem.special_order_price) {
       Swal.fire("Error", "Name and Price are required!", "error");
       return;
     }
 
-    const nextId =
-      specialOrders.length > 0
-        ? Math.max(...specialOrders.map((o) => o.special_order_id)) + 1
-        : 1;
+    if (!user?.userid) {
+      Swal.fire("Error", "User not authenticated", "error");
+      return;
+    }
 
-    const newOrder = {
-      ...newItem,
-      special_order_id: nextId,
-      special_order_price: Number(newItem.special_order_price),
-      userid: loggedInUserId, // assign logged-in user
-    };
-
-    setSpecialOrders([...specialOrders, newOrder]);
-    Swal.fire("Success", "Special order added successfully!", "success");
-
-    setNewItem({
-      special_order_name: "",
-      special_order_desc: "",
-      special_order_price: "",
-      special_order_status: "active",
-    });
-
-    setShowAdd(false);
+    try {
+      const res = await addSpecialOrder({
+        special_order_name: newItem.special_order_name,
+        special_order_desc: newItem.special_order_desc,
+        special_order_price: Number(newItem.special_order_price),
+        special_order_status: newItem.special_order_status,
+        // userid: user.userid, // Temporarily removed until backend schema is fixed
+      });
+      if (res.status === 'success') {
+        Swal.fire("Success", "Special order added successfully!", "success");
+        setNewItem({
+          special_order_name: "",
+          special_order_desc: "",
+          special_order_price: "",
+          special_order_status: "active",
+        });
+        setShowAdd(false);
+        // Refetch
+        const fetchRes = await listSpecialOrders();
+        if (fetchRes.status === 'success') setSpecialOrders(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to add", "error");
+      }
+    } catch (error) {
+      console.error('Error adding:', error);
+      Swal.fire("Error", "Failed to add", "error");
+    }
   };
 
   // ------------------- EDIT -------------------
   const openEdit = (item) => {
     setSelectedItem(item);
+    setNewItem({
+      special_order_name: item.special_order_name,
+      special_order_desc: item.special_order_desc,
+      special_order_price: item.special_order_price,
+      special_order_status: item.special_order_status,
+    });
     setShowEdit(true);
   };
 
-  const handleEditSave = () => {
+  const handleEditSave = async () => {
     if (!selectedItem.special_order_name.trim() || !selectedItem.special_order_price) {
       Swal.fire("Error", "Name and Price are required!", "error");
       return;
     }
 
-    setSpecialOrders(
-      specialOrders.map((o) =>
-        o.special_order_id === selectedItem.special_order_id
-          ? { ...selectedItem, special_order_price: Number(selectedItem.special_order_price) }
-          : o
-      )
-    );
-
-    Swal.fire("Success", "Special order updated successfully!", "success");
-    setShowEdit(false);
+    try {
+      const res = await updateSpecialOrder({
+        special_order_id: selectedItem.special_order_id,
+        special_order_name: selectedItem.special_order_name,
+        special_order_desc: selectedItem.special_order_desc,
+        special_order_price: Number(selectedItem.special_order_price),
+        special_order_status: selectedItem.special_order_status,
+      });
+      if (res.status === 'success') {
+        Swal.fire("Success", "Special order updated successfully!", "success");
+        setShowEdit(false);
+        setSelectedItem(null);
+        setNewItem({
+          special_order_name: "",
+          special_order_desc: "",
+          special_order_price: "",
+          special_order_status: "active",
+        });
+        // Refetch
+        const fetchRes = await listSpecialOrders();
+        if (fetchRes.status === 'success') setSpecialOrders(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to update", "error");
+      }
+    } catch (error) {
+      console.error('Error updating:', error);
+      Swal.fire("Error", "Failed to update", "error");
+    }
   };
 
   // ------------------- DELETE -------------------
@@ -117,15 +138,32 @@ export default function SpecialOrder() {
     setShowDelete(true);
   };
 
-  const handleDelete = () => {
-    setSpecialOrders(
-      specialOrders.filter((o) => o.special_order_id !== selectedItem.special_order_id)
-    );
-    Swal.fire("Deleted", "Special order deleted successfully!", "success");
-    setShowDelete(false);
+  const handleDelete = async () => {
+    try {
+      const res = await deleteSpecialOrder(selectedItem.special_order_id);
+      if (res.status === 'success') {
+        Swal.fire("Deleted", "Special order deleted successfully!", "success");
+        setShowDelete(false);
+        setSelectedItem(null);
+        // Refetch
+        const fetchRes = await listSpecialOrders();
+        if (fetchRes.status === 'success') setSpecialOrders(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to delete", "error");
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+      Swal.fire("Error", "Failed to delete", "error");
+    }
   };
 
-  return (
+  return loading ? (
+    <div className="p-6 bg-white rounded shadow">
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    </div>
+  ) : (
     <div className="p-6 bg-white rounded shadow">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">

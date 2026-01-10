@@ -16,6 +16,10 @@ class BaseModel {
         $this->db = Database::getConnection();
     }
     
+    public function getDb() {
+        return $this->db;
+    }
+    
     // Common CRUD methods
     public function findAll() {
         $query = "SELECT * FROM {$this->table}";
@@ -63,7 +67,7 @@ class BaseModel {
             $setClause[] = "$key = :$key";
         }
         $setClause = implode(', ', $setClause);
-        
+
         $query = "UPDATE {$this->table} SET $setClause WHERE {$this->primaryKey} = :id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $id);

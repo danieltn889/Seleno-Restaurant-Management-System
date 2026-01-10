@@ -8,7 +8,7 @@ import api from "../axios";
  */
 export const addUser = async (userData) => {
   try {
-    const response = await api.post("/users/add.php", userData);
+    const response = await api.post("/users/add", userData);
     return response.data;
   } catch (error) {
     console.error("Add user error:", error);
@@ -22,7 +22,7 @@ export const addUser = async (userData) => {
  */
 export const listUsers = async () => {
   try {
-    const response = await api.get("/users/list.php");
+    const response = await api.get("/users/list");
     return response.data;
   } catch (error) {
     console.error("List users error:", error);
@@ -37,7 +37,7 @@ export const listUsers = async () => {
  */
 export const updateUser = async (userData) => {
   try {
-    const response = await api.put("/users/update.php", userData);
+    const response = await api.put("/users/update", userData);
     return response.data;
   } catch (error) {
     console.error("Update user error:", error);
@@ -52,7 +52,7 @@ export const updateUser = async (userData) => {
  */
 export const deleteUser = async (userid) => {
   try {
-    const response = await api.delete(`/users/delete.php?userid=${userid}`);
+    const response = await api.delete(`/users/delete?userid=${userid}`);
     return response.data;
   } catch (error) {
     console.error("Delete user error:", error);

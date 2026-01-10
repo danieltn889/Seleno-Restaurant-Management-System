@@ -34,16 +34,18 @@ export default function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     if (!user?.token) return;
-    
+
     try {
       const response = await validateToken(user.token);
-      if (!response.success) {
+      // Backend returns { status: 'success' | 'error', ... }
+      if (response?.status !== 'success') {
         // Token invalid, logout user
         logout();
       }
     } catch (error) {
       console.error('Token validation error:', error);
-      logout();
+      // Don't logout on timeout, just log the error
+      // logout();
     }
   };
 

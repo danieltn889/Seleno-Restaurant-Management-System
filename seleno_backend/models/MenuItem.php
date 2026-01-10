@@ -4,6 +4,6 @@
 namespace Models;
 
 class MenuItem extends BaseModel {
-    protected $table = 'menu_items';
+    protected $table = 'menu_item';
     protected $primaryKey = 'menu_item_id';
 }

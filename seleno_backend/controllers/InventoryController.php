@@ -45,6 +45,28 @@ class InventoryController extends BaseController
         return $this->success('Stocks listed', $data);
     }
 
+    public function addStockCategory($params = [])
+    {
+        $requestData = json_decode(file_get_contents('php://input'), true);
+
+        if (empty($requestData['stockcat_name'])) {
+            return $this->error('Stock category name is required. Please provide a name for the category');
+        }
+
+        if (isset($requestData['stockcat_status']) && !in_array($requestData['stockcat_status'], ['active', 'inactive'])) {
+            return $this->error("Invalid status. Allowed values are: 'active' or 'inactive'");
+        }
+
+        $model = new StockCategory();
+        $data = [
+            'stockcat_name' => $requestData['stockcat_name'],
+            'stockcat_status' => $requestData['stockcat_status'] ?? 'active'
+        ];
+
+        $id = $model->create($data);
+        return $id ? $this->success('Stock category added successfully') : $this->error('Failed to add stock category');
+    }
+
     public function updateStockCategory($params = [])
     {
         $requestData = json_decode(file_get_contents('php://input'), true);
@@ -310,6 +332,43 @@ class InventoryController extends BaseController
         return $this->error('Failed to add stock in. Please check if the operation would result in valid stock levels');
     }
 
+    public function updateStockIn($params = [])
+    {
+        $requestData = json_decode(file_get_contents('php://input'), true);
+
+        if (empty($requestData['stockin_id'])) {
+            return $this->error('Stock in ID is required. Please provide the stockin_id of the record you want to update');
+        }
+
+        $model = new StockIn();
+        $existing = $model->find($requestData['stockin_id']);
+        if (!$existing) {
+            return $this->error('Stock in record not found. Please check the stockin_id and ensure the record exists');
+        }
+
+        if (isset($requestData['stock_id'])) {
+            $stockModel = new Stock();
+            if (!$stockModel->find($requestData['stock_id'])) {
+                return $this->error('Stock not found. Please check the stock_id and ensure the stock item exists');
+            }
+        }
+
+        if (isset($requestData['stockin_qty']) && !is_numeric($requestData['stockin_qty'])) {
+            return $this->error('Stock in quantity must be a number. Please provide a valid numeric value');
+        }
+
+        $success = $model->update($requestData['stockin_id'], $requestData);
+        return $success ? $this->success('Stock in record updated') : $this->error('Failed to update stock in record');
+    }
+
+    public function deleteStockIn($params = [])
+    {
+        $stockin_id = $_GET['stockin_id'];
+        $model = new StockIn();
+        $success = $model->delete($stockin_id);
+        return $success ? $this->success('Stock in record deleted') : $this->error('Failed to delete stock in record');
+    }
+
     public function addStockOut($params = [])
     {
         $requestData = json_decode(file_get_contents('php://input'), true);
@@ -344,6 +403,108 @@ class InventoryController extends BaseController
             return $this->success('Stock deducted successfully', ['current_qty' => $updatedStock['stock_qty']]);
         }
         return $this->error('Failed to add stock out. Please check if there is sufficient stock quantity');
+    }
+
+    public function updateStockOut($params = [])
+    {
+        $requestData = json_decode(file_get_contents('php://input'), true);
+
+        if (empty($requestData['stockout_id'])) {
+            return $this->error('Stock out ID is required. Please provide the stockout_id of the record you want to update');
+        }
+
+        $model = new StockOut();
+        $existing = $model->find($requestData['stockout_id']);
+        if (!$existing) {
+            return $this->error('Stock out record not found. Please check the stockout_id and ensure the record exists');
+        }
+
+        if (isset($requestData['stock_id'])) {
+            $stockModel = new Stock();
+            if (!$stockModel->find($requestData['stock_id'])) {
+                return $this->error('Stock not found. Please check the stock_id and ensure the stock item exists');
+            }
+        }
+
+        if (isset($requestData['stockout_qty']) && !is_numeric($requestData['stockout_qty'])) {
+            return $this->error('Stock out quantity must be a number. Please provide a valid numeric value');
+        }
+
+        // Handle stock quantity adjustment
+        $stockModel = new Stock();
+        $oldStockId = $existing['stock_id'];
+        $newStockId = $requestData['stock_id'] ?? $oldStockId;
+
+        $oldQty = $existing['stockout_qty'];
+        $newQty = $requestData['stockout_qty'] ?? $oldQty;
+
+        // If stock_id is changing, handle both old and new stocks
+        if ($oldStockId != $newStockId) {
+            // Add back the old quantity to the old stock
+            $oldStock = $stockModel->find($oldStockId);
+            $oldStockQty = $oldStock['stock_qty'] + $oldQty;
+            $stockModel->update($oldStockId, ['stock_qty' => $oldStockQty]);
+
+            // Check if new stock has enough quantity
+            $newStock = $stockModel->find($newStockId);
+            $newStockQty = $newStock['stock_qty'] - $newQty;
+
+            if ($newStockQty < 0) {
+                return $this->error('Insufficient stock quantity in the new stock item');
+            }
+
+            $stockModel->update($newStockId, ['stock_qty' => $newStockQty]);
+        } else {
+            // Same stock, just adjust the difference
+            $stock = $stockModel->find($oldStockId);
+            $currentStockQty = $stock['stock_qty'];
+            $qtyDifference = $newQty - $oldQty;
+            $newStockQty = $currentStockQty - $qtyDifference;
+
+            if ($newStockQty < 0) {
+                return $this->error('Insufficient stock quantity for this update');
+            }
+
+            $stockModel->update($oldStockId, ['stock_qty' => $newStockQty]);
+        }
+
+        // Update stock out record
+        $success = $model->update($requestData['stockout_id'], $requestData);
+        return $success ? $this->success('Stock out record updated successfully') : $this->error('Failed to update stock out record');
+    }
+
+    public function deleteStockOut($params = [])
+    {
+        $stockout_id = $_GET['stockout_id'];
+        $model = new StockOut();
+        $stockOut = $model->find($stockout_id);
+
+        if (!$stockOut) {
+            return $this->error('Stock out record not found');
+        }
+
+        // Add back the quantity to stock before deleting
+        $stockModel = new Stock();
+        $stock = $stockModel->find($stockOut['stock_id']);
+        $newQty = $stock['stock_qty'] + $stockOut['stockout_qty'];
+        $stockModel->update($stockOut['stock_id'], ['stock_qty' => $newQty]);
+
+        $success = $model->delete($stockout_id);
+        return $success ? $this->success('Stock out record deleted successfully') : $this->error('Failed to delete stock out record');
+    }
+
+    public function listStockIn($params = [])
+    {
+        $model = new StockIn();
+        $data = $model->findAll();
+        return $this->success('Stock in records listed', $data);
+    }
+
+    public function listStockOut($params = [])
+    {
+        $model = new StockOut();
+        $data = $model->findAll();
+        return $this->success('Stock out records listed', $data);
     }
 }
 

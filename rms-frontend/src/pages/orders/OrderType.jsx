@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { listOrderTypes, addOrderType, updateOrderType, deleteOrderType } from "../../api/services/orders";
 
 export default function OrderType() {
-  // 🔹 Dummy data for order types
   const [orderTypes, setOrderTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Modal states
   const [showAdd, setShowAdd] = useState(false);
@@ -20,75 +21,86 @@ export default function OrderType() {
 
   const userRole = "admin"; // change to "user" to hide delete
 
-  // ------------------- INIT DUMMY DATA -------------------
+  // ------------------- INIT DATA -------------------
   useEffect(() => {
-    setOrderTypes([
-      {
-        order_type_id: 1,
-        order_type_name: "Dine-In",
-        order_type_status: "active",
-        order_type_created_date: "2026-01-01",
-        order_type_date_updated: "2026-01-02",
-      },
-      {
-        order_type_id: 2,
-        order_type_name: "Takeaway",
-        order_type_status: "active",
-        order_type_created_date: "2026-01-03",
-        order_type_date_updated: "2026-01-04",
-      },
-      {
-        order_type_id: 3,
-        order_type_name: "Delivery",
-        order_type_status: "inactive",
-        order_type_created_date: "2026-01-05",
-        order_type_date_updated: "2026-01-06",
-      },
-    ]);
+    const fetchOrderTypes = async () => {
+      try {
+        const res = await listOrderTypes();
+        if (res.status === 'success') {
+          setOrderTypes(res.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching order types:', error);
+        Swal.fire('Error', 'Failed to load order types', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrderTypes();
   }, []);
 
   // ------------------- ADD -------------------
-  const handleAddSave = () => {
+  const handleAddSave = async () => {
     if (!newItem.order_type_name.trim()) {
       Swal.fire("Error", "Order type name is required!", "error");
       return;
     }
 
-    const today = new Date().toISOString().split("T")[0];
-
-    const newOrderType = {
-      order_type_id: orderTypes.length > 0 ? Math.max(...orderTypes.map(o => o.order_type_id)) + 1 : 1,
-      order_type_name: newItem.order_type_name,
-      order_type_status: newItem.order_type_status,
-      order_type_created_date: today,
-      order_type_date_updated: today,
-    };
-
-    setOrderTypes([...orderTypes, newOrderType]);
-    Swal.fire("Success", "Order type added successfully!", "success");
-
-    setNewItem({ order_type_name: "", order_type_status: "active" });
-    setShowAdd(false);
+    try {
+      const res = await addOrderType(newItem);
+      if (res.status === 'success') {
+        Swal.fire("Success", "Order type added successfully!", "success");
+        setNewItem({ order_type_name: "", order_type_status: "active" });
+        setShowAdd(false);
+        // Refetch
+        const fetchRes = await listOrderTypes();
+        if (fetchRes.status === 'success') setOrderTypes(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to add", "error");
+      }
+    } catch (error) {
+      console.error('Error adding:', error);
+      Swal.fire("Error", "Failed to add", "error");
+    }
   };
 
   // ------------------- EDIT -------------------
   const openEdit = (item) => {
     setSelectedItem(item);
+    setNewItem({
+      order_type_name: item.order_type_name,
+      order_type_status: item.order_type_status,
+    });
     setShowEdit(true);
   };
 
-  const handleEditSave = () => {
+  const handleEditSave = async () => {
     if (!selectedItem.order_type_name.trim()) {
       Swal.fire("Error", "Order type name is required!", "error");
       return;
     }
 
-    const today = new Date().toISOString().split("T")[0];
-    const updatedOrderType = { ...selectedItem, order_type_date_updated: today };
-
-    setOrderTypes(orderTypes.map(o => o.order_type_id === selectedItem.order_type_id ? updatedOrderType : o));
-    Swal.fire("Success", "Order type updated successfully!", "success");
-    setShowEdit(false);
+    try {
+      const res = await updateOrderType({
+        order_type_id: selectedItem.order_type_id,
+        order_type_name: selectedItem.order_type_name,
+        order_type_status: selectedItem.order_type_status,
+      });
+      if (res.status === 'success') {
+        Swal.fire("Success", "Order type updated successfully!", "success");
+        setShowEdit(false);
+        setSelectedItem(null);
+        setNewItem({ order_type_name: "", order_type_status: "active" });
+        // Refetch
+        const fetchRes = await listOrderTypes();
+        if (fetchRes.status === 'success') setOrderTypes(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to update", "error");
+      }
+    } catch (error) {
+      console.error('Error updating:', error);
+      Swal.fire("Error", "Failed to update", "error");
+    }
   };
 
   // ------------------- DELETE -------------------
@@ -97,11 +109,26 @@ export default function OrderType() {
     setShowDelete(true);
   };
 
-  const handleDelete = () => {
-    setOrderTypes(orderTypes.filter(o => o.order_type_id !== selectedItem.order_type_id));
-    Swal.fire("Deleted", "Order type deleted successfully!", "success");
-    setShowDelete(false);
+  const handleDelete = async () => {
+    try {
+      const res = await deleteOrderType(selectedItem.order_type_id);
+      if (res.status === 'success') {
+        Swal.fire("Deleted", "Order type deleted successfully!", "success");
+        setShowDelete(false);
+        setSelectedItem(null);
+        // Refetch
+        const fetchRes = await listOrderTypes();
+        if (fetchRes.status === 'success') setOrderTypes(fetchRes.data || []);
+      } else {
+        Swal.fire("Error", res.message || "Failed to delete", "error");
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+      Swal.fire("Error", "Failed to delete", "error");
+    }
   };
+
+  if (loading) return <div className="text-center p-4">Loading...</div>;
 
   return (
     <div className="p-6 bg-white rounded shadow">

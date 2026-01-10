@@ -13,7 +13,7 @@ const handleError = (error) => {
  */
 export const addPayment = async (data) => {
   try {
-    const response = await api.post("/payments/add.php", data);
+    const response = await api.post("/payments/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -27,7 +27,7 @@ export const addPayment = async (data) => {
  */
 export const checkPaymentStatus = async (order_id) => {
   try {
-    const response = await api.get(`/payments/status.php?order_id=${order_id}`);
+    const response = await api.get(`/payments/status?order_id=${order_id}`);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -40,7 +40,7 @@ export const checkPaymentStatus = async (order_id) => {
  */
 export const listPayments = async () => {
   try {
-    const response = await api.get("/payments/list.php");
+    const response = await api.get("/payments/list");
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -54,7 +54,7 @@ export const listPayments = async () => {
  */
 export const updatePayment = async (data) => {
   try {
-    const response = await api.put("/payments/update.php", data);
+    const response = await api.put("/payments/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -68,7 +68,7 @@ export const updatePayment = async (data) => {
  */
 export const deletePayment = async (payment_id) => {
   try {
-    const response = await api.delete(`/payments/delete.php?payment_id=${payment_id}`);
+    const response = await api.delete(`/payments/delete?payment_id=${payment_id}`);
     return response.data;
   } catch (error) {
     return handleError(error);

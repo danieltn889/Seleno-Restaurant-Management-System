@@ -9,7 +9,7 @@ const handleError = (error) => {
 // ========== Table Groups ==========
 export const addTableGroup = async (data) => {
   try {
-    const response = await api.post("/tables/group/add.php", data);
+    const response = await api.post("/tables/group/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -18,7 +18,7 @@ export const addTableGroup = async (data) => {
 
 export const listTableGroups = async () => {
   try {
-    const response = await api.get("/tables/group/list.php");
+    const response = await api.get("/tables/group/list");
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -27,7 +27,7 @@ export const listTableGroups = async () => {
 
 export const updateTableGroup = async (data) => {
   try {
-    const response = await api.put("/tables/group/update.php", data);
+    const response = await api.put("/tables/group/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -36,7 +36,7 @@ export const updateTableGroup = async (data) => {
 
 export const deleteTableGroup = async (id) => {
   try {
-    const response = await api.delete(`/tables/group/delete.php?id=${id}`);
+    const response = await api.delete(`/tables/group/delete?id=${id}`);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -46,7 +46,7 @@ export const deleteTableGroup = async (id) => {
 // ========== Tables ==========
 export const addTable = async (data) => {
   try {
-    const response = await api.post("/tables/add.php", data);
+    const response = await api.post("/tables/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -55,7 +55,7 @@ export const addTable = async (data) => {
 
 export const listTables = async () => {
   try {
-    const response = await api.get("/tables/list.php");
+    const response = await api.get("/tables/list");
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -64,7 +64,7 @@ export const listTables = async () => {
 
 export const updateTable = async (data) => {
   try {
-    const response = await api.put("/tables/update.php", data);
+    const response = await api.put("/tables/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -73,7 +73,7 @@ export const updateTable = async (data) => {
 
 export const deleteTable = async (id) => {
   try {
-    const response = await api.delete(`/tables/delete.php?id=${id}`);
+    const response = await api.delete(`/tables/delete?id=${id}`);
     return response.data;
   } catch (error) {
     return handleError(error);

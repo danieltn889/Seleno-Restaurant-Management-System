@@ -30,10 +30,19 @@ class PaymentController extends BaseController {
             return $this->error('Order not found. Please check the order_id and ensure the order exists');
         }
         
-        if (isset($requestData['payment_method']) && !in_array($requestData['payment_method'], ['cash', 'card', 'mobile'])) {
-            return $this->error("Invalid payment method. Allowed values are: 'cash', 'card', or 'mobile'");
+        // Normalize and validate payment method
+        if (isset($requestData['payment_method'])) {
+            $requestData['payment_method'] = strtolower($requestData['payment_method']);
+            if (!in_array($requestData['payment_method'], ['cash', 'card', 'mobile'])) {
+                return $this->error("Invalid payment method. Allowed values are: 'cash', 'card', or 'mobile'");
+            }
         }
-        
+
+        // If partial payment, ensure partial_reason is provided
+        if (($requestData['payment_status'] ?? '') === 'partial' && empty(trim($requestData['partial_reason'] ?? ''))) {
+            return $this->error('Partial payment reason is required when payment status is partial');
+        }
+
         $model = new Payment();
         $id = $model->create($requestData);
         if ($id) {

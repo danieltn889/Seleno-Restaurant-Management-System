@@ -40,7 +40,7 @@ class TableController extends BaseController {
     public function addTable($params = []) {
         $requestData = json_decode(file_get_contents('php://input'), true);
         
-        $required = ['table_group_id', 'table_desc'];
+        $required = ['table_group_id', 'table_name'];
         foreach ($required as $field) {
             if (empty($requestData[$field])) {
                 return $this->error("The field '$field' is required and cannot be empty");
@@ -62,5 +62,33 @@ class TableController extends BaseController {
         $model = new Table();
         $data = $model->findAll();
         return $this->success('Tables listed', $data);
+    }
+
+    public function updateTable($params = []) {
+        $requestData = json_decode(file_get_contents('php://input'), true);
+        
+        $required = ['table_id', 'table_group_id', 'table_name'];
+        foreach ($required as $field) {
+            if (empty($requestData[$field])) {
+                return $this->error("The field '$field' is required and cannot be empty");
+            }
+        }
+        
+        // Check if table_group_id exists
+        $groupModel = new TableGroup();
+        if (!$groupModel->find($requestData['table_group_id'])) {
+            return $this->error('Table group not found. Please check the table_group_id and ensure it exists');
+        }
+        
+        $model = new Table();
+        $success = $model->update($requestData['table_id'], $requestData);
+        return $success ? $this->success('Table updated') : $this->error('Failed to update table');
+    }
+
+    public function deleteTable($params = []) {
+        $id = $_GET['id'];
+        $model = new Table();
+        $success = $model->delete($id);
+        return $success ? $this->success('Table deleted') : $this->error('Failed to delete table');
     }
 }

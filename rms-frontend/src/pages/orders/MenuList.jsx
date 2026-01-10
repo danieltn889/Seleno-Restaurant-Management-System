@@ -1,28 +1,38 @@
-import { useState } from "react";
-
-const dummyMenu = [
-  { id: 1, category: "Restaurant", name: "Chef Salad", price: 6000 },
-  { id: 2, category: "Restaurant", name: "Grilled Chicken", price: 12000 },
-  { id: 3, category: "Bar", name: "Heineken", price: 3000 },
-  { id: 4, category: "Bar", name: "Cocktail", price: 7000 },
-  { id: 5, category: "Coffee", name: "Cappuccino", price: 2500 },
-  { id: 6, category: "Coffee", name: "Espresso", price: 2000 },
-];
+import { useState, useEffect } from "react";
+import { listMenuItems } from "../../api/services/menu";
 
 export default function MenuList({ category, table, tableOrders, setTableOrders, orderStatus }) {
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [qtys, setQtys] = useState({});
 
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      try {
+        const res = await listMenuItems();
+        if (res.status === 'success') {
+          setMenuItems(res.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching menu items:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMenuItems();
+  }, []);
+
   const addItem = (item) => {
-    const qty = qtys[item.id] || 1;
+    const qty = qtys[item.menu_item_id] || 1;
 
     setTableOrders((prev) => {
       const catData = prev?.[table]?.[category] || { items: [], status: "PENDING" };
       const items = catData.items;
-      const existing = items.find((i) => i.id === item.id);
+      const existing = items.find((i) => i.menu_item_id === item.menu_item_id);
 
       const newItems = existing
         ? items.map((i) =>
-            i.id === item.id ? { ...i, qty: i.qty + qty } : i
+            i.menu_item_id === item.menu_item_id ? { ...i, qty: i.qty + qty } : i
           )
         : [...items, { ...item, qty }];
 
@@ -39,26 +49,28 @@ export default function MenuList({ category, table, tableOrders, setTableOrders,
     });
   };
 
+  if (loading) return <div className="text-center p-4">Loading menu...</div>;
+
   return (
     <div className="bg-white p-4 rounded shadow">
       <h2 className="font-semibold mb-3">{category} Menu</h2>
       <div className="grid sm:grid-cols-2 gap-4">
-        {dummyMenu
+        {menuItems
           .filter((i) => i.category === category)
           .map((item) => (
             <div
-              key={item.id}
+              key={item.menu_item_id}
               className="border rounded p-3 hover:shadow transition flex flex-col"
             >
-              <p className="font-semibold">{item.name}</p>
-              <p className="text-sm text-gray-500">{item.price} RWF</p>
+              <p className="font-semibold">{item.menu_item_name}</p>
+              <p className="text-sm text-gray-500">{item.menu_price || 0} RWF</p>
               <div className="mt-2 flex items-center gap-2">
                 <input
                   type="number"
                   min={1}
-                  value={qtys[item.id] || 1}
+                  value={qtys[item.menu_item_id] || 1}
                   onChange={(e) =>
-                    setQtys({ ...qtys, [item.id]: parseInt(e.target.value) })
+                    setQtys({ ...qtys, [item.menu_item_id]: parseInt(e.target.value) })
                   }
                   className="border w-16 p-1 rounded"
                 />

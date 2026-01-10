@@ -9,7 +9,7 @@ const handleError = (error) => {
 // ========== Stock Category ==========
 export const addStockCategory = async (data) => {
   try {
-    const response = await api.post("/inventory/stock-category/add.php", data);
+    const response = await api.post("/inventory/stock-category/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -18,7 +18,7 @@ export const addStockCategory = async (data) => {
 
 export const listStockCategories = async () => {
   try {
-    const response = await api.get("/inventory/stock-category/list.php");
+    const response = await api.get("/inventory/stock-category/list");
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -27,7 +27,7 @@ export const listStockCategories = async () => {
 
 export const updateStockCategory = async (data) => {
   try {
-    const response = await api.put("/inventory/stock-category/update.php", data);
+    const response = await api.put("/inventory/stock-category/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -36,7 +36,7 @@ export const updateStockCategory = async (data) => {
 
 export const deleteStockCategory = async (stockcat_id) => {
   try {
-    const response = await api.delete(`/inventory/stock-category/delete.php?stockcat_id=${stockcat_id}`);
+    const response = await api.delete(`/inventory/stock-category/delete?stockcat_id=${stockcat_id}`);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -46,7 +46,7 @@ export const deleteStockCategory = async (stockcat_id) => {
 // ========== Stock Item Category Group ==========
 export const addStockGroup = async (data) => {
   try {
-    const response = await api.post("/inventory/stock-group/add.php", data);
+    const response = await api.post("/inventory/stock-group/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -55,7 +55,7 @@ export const addStockGroup = async (data) => {
 
 export const listStockGroups = async () => {
   try {
-    const response = await api.get("/inventory/stock-group/list.php");
+    const response = await api.get("/inventory/stock-group/list");
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -64,7 +64,7 @@ export const listStockGroups = async () => {
 
 export const updateStockGroup = async (data) => {
   try {
-    const response = await api.put("/inventory/stock-group/update.php", data);
+    const response = await api.put("/inventory/stock-group/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -73,7 +73,7 @@ export const updateStockGroup = async (data) => {
 
 export const deleteStockGroup = async (group_id) => {
   try {
-    const response = await api.delete(`/inventory/stock-group/delete.php?group_id=${group_id}`);
+    const response = await api.delete("/inventory/stock-group/delete", { data: { group_id } });
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -83,7 +83,7 @@ export const deleteStockGroup = async (group_id) => {
 // ========== Stock Item Category ==========
 export const addStockItemCategory = async (data) => {
   try {
-    const response = await api.post("/inventory/stock-item-category/add.php", data);
+    const response = await api.post("/inventory/stock-item-category/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -92,7 +92,7 @@ export const addStockItemCategory = async (data) => {
 
 export const listStockItemCategories = async () => {
   try {
-    const response = await api.get("/inventory/stock-item-category/list.php");
+    const response = await api.get("/inventory/stock-item-category/list");
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -101,7 +101,7 @@ export const listStockItemCategories = async () => {
 
 export const updateStockItemCategory = async (data) => {
   try {
-    const response = await api.put("/inventory/stock-item-category/update.php", data);
+    const response = await api.put("/inventory/stock-item-category/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -110,7 +110,7 @@ export const updateStockItemCategory = async (data) => {
 
 export const deleteStockItemCategory = async (id) => {
   try {
-    const response = await api.delete(`/inventory/stock-item-category/delete.php?id=${id}`);
+    const response = await api.delete("/inventory/stock-item-category/delete", { data: { id } });
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -120,7 +120,7 @@ export const deleteStockItemCategory = async (id) => {
 // ========== Stocks ==========
 export const addStock = async (data) => {
   try {
-    const response = await api.post("/inventory/stocks/add.php", data);
+    const response = await api.post("/inventory/stocks/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -129,7 +129,7 @@ export const addStock = async (data) => {
 
 export const listStocks = async () => {
   try {
-    const response = await api.get("/inventory/stocks/list.php");
+    const response = await api.get("/inventory/stocks/list");
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -138,7 +138,7 @@ export const listStocks = async () => {
 
 export const updateStock = async (data) => {
   try {
-    const response = await api.put("/inventory/stocks/update.php", data);
+    const response = await api.put("/inventory/stocks/update", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -147,7 +147,7 @@ export const updateStock = async (data) => {
 
 export const deleteStock = async (stock_id) => {
   try {
-    const response = await api.delete(`/inventory/stocks/delete.php?stock_id=${stock_id}`);
+    const response = await api.delete("/inventory/stocks/delete", { data: { stock_id } });
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -157,7 +157,7 @@ export const deleteStock = async (stock_id) => {
 // ========== Stock IN ==========
 export const addStockIn = async (data) => {
   try {
-    const response = await api.post("/inventory/stockin/add.php", data);
+    const response = await api.post("/inventory/stockin/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -166,7 +166,25 @@ export const addStockIn = async (data) => {
 
 export const listStockIn = async () => {
   try {
-    const response = await api.get("/inventory/stockin/list.php");
+    const response = await api.get("/inventory/stockin/list");
+    return response.data;
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export const updateStockIn = async (data) => {
+  try {
+    const response = await api.put("/inventory/stockin/update", data);
+    return response.data;
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export const deleteStockIn = async (stockin_id) => {
+  try {
+    const response = await api.delete(`/inventory/stockin/delete?stockin_id=${stockin_id}`);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -176,7 +194,7 @@ export const listStockIn = async () => {
 // ========== Stock OUT ==========
 export const addStockOut = async (data) => {
   try {
-    const response = await api.post("/inventory/stockout/add.php", data);
+    const response = await api.post("/inventory/stockout/add", data);
     return response.data;
   } catch (error) {
     return handleError(error);
@@ -185,7 +203,25 @@ export const addStockOut = async (data) => {
 
 export const listStockOut = async () => {
   try {
-    const response = await api.get("/inventory/stockout/list.php");
+    const response = await api.get("/inventory/stockout/list");
+    return response.data;
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export const updateStockOut = async (data) => {
+  try {
+    const response = await api.put("/inventory/stockout/update", data);
+    return response.data;
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export const deleteStockOut = async (stockout_id) => {
+  try {
+    const response = await api.delete(`/inventory/stockout/delete?stockout_id=${stockout_id}`);
     return response.data;
   } catch (error) {
     return handleError(error);

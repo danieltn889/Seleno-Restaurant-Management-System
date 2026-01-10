@@ -8,10 +8,10 @@ export default function InvoicePrint({ table, tableOrders, servedBy, orderId, or
     const catData = tableOrders[table][cat];
     if (!catData?.items || !Array.isArray(catData.items)) return [];
     return catData.items.map(i => ({
-      id: i.id || 0,
-      name: i.name || "Item",
+      id: i.menu_item_id || 0,
+      name: i.menu_item_name || "Item",
       qty: i.qty || 0,
-      price: i.price || 0
+      price: i.menu_price || 0
     }));
   });
 
@@ -20,6 +20,10 @@ export default function InvoicePrint({ table, tableOrders, servedBy, orderId, or
   const totalAmount = allItems.reduce((sum, i) => sum + i.price * i.qty, 0);
 
   const printInvoice = () => {
+    // Generate order ID and date if not provided
+    const currentOrderId = orderId || `INV-${table}-${Date.now()}`;
+    const currentOrderDate = orderDate || new Date().toLocaleString();
+
     const win = window.open("", "", "width=300,height=600");
     win.document.write(`
       <html>
@@ -33,8 +37,8 @@ export default function InvoicePrint({ table, tableOrders, servedBy, orderId, or
         </head>
         <body>
           <h2>SERENO RESTAURANT</h2>
-          <p>Order ID: ${orderId}</p>
-          <p>Date: ${orderDate}</p>
+          <p>Order ID: ${currentOrderId}</p>
+          <p>Date: ${currentOrderDate}</p>
           <p>Table: ${table}</p>
           <p>Served By: ${servedBy.firstname} ${servedBy.lastname}</p>
           <hr/>

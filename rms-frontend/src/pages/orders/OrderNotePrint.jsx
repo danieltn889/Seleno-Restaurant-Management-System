@@ -2,6 +2,10 @@ export default function OrderNotePrint({ table, category, items, servedBy, order
   if (!items || items.length === 0) return null;
 
   const printOrderNote = () => {
+    // Generate order ID and date if not provided
+    const currentOrderId = orderId || `ORD-${Date.now()}`;
+    const currentOrderDate = orderDate || new Date().toLocaleString();
+
     const win = window.open("", "", "width=300,height=600");
     win.document.write(`
       <html>
@@ -15,13 +19,13 @@ export default function OrderNotePrint({ table, category, items, servedBy, order
         </head>
         <body>
           <h2>SERENO ORDER NOTE</h2>
-          <p>Order ID: ${orderId}</p>
-          <p>Date: ${orderDate}</p>
+          <p>Order ID: ${currentOrderId}</p>
+          <p>Date: ${currentOrderDate}</p>
           <p>Category: ${category}</p>
           <p>Table: ${table}</p>
           <p>Served By: ${servedBy.firstname} ${servedBy.lastname}</p>
           <hr/>
-          ${items.map(i => `<p>${i.name} x ${i.qty}</p>`).join('')}
+          ${items.map(i => `<p>${i.menu_item_name || 'Unknown Item'} x ${i.qty}</p>`).join('')}
           <hr/>
           <p style="text-align:center;">--- ORDER NOTE ---</p>
         </body>

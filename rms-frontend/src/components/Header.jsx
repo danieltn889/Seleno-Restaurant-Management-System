@@ -5,7 +5,7 @@ export default function Header({ user, toggleSidebar }) {
   if (!user) return null;
 
   return (
-    <header className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4 bg-white shadow sticky top-0 z-20">
+    <header className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4 bg-white shadow sticky top-0 z-10">
       {/* Mobile menu button */}
       <button
         className="md:hidden text-gray-600 text-2xl focus:outline-none"

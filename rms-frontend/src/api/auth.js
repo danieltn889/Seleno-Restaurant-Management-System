@@ -58,7 +58,8 @@ export async function validateToken(token) {
     const response = await api.post("/validate-token", {}, {
       headers: {
         'Authorization': `Bearer ${token}`
-      }
+      },
+      timeout: 5000 // 5 seconds for token validation
     });
     
     return response.data;

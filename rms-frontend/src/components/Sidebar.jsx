@@ -13,7 +13,9 @@ export default function Sidebar({ user, sidebarOpen, setSidebarOpen }) {
   const [dropdowns, setDropdowns] = useState({
     users: false,
     inventory: false,
+    stock: false,
     menu: false,
+    table: false,
     orders: false,
   });
 
@@ -25,12 +27,14 @@ export default function Sidebar({ user, sidebarOpen, setSidebarOpen }) {
     <>
       {/* Overlay for mobile */}
       <div 
-        className={`fixed inset-0 bg-black bg-opacity-30 z-10 md:hidden transition-opacity duration-300 ${sidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"}`} 
+        className={`fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden transition-opacity duration-300 ${sidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"}`} 
         onClick={() => setSidebarOpen(false)}
       />
 
-      <aside className={`bg-white shadow-lg fixed z-20 inset-y-0 left-0 w-64 flex flex-col transform transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:relative`}>
+      <aside className={`bg-white shadow-lg inset-y-0 left-0 w-64 flex flex-col transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+        md:translate-x-0
+        fixed md:static z-40`}>
         
         {/* Header with X for mobile */}
         <div className="px-6 py-4 flex justify-between items-center border-b  bg-amber-800 text-white">
@@ -46,7 +50,7 @@ export default function Sidebar({ user, sidebarOpen, setSidebarOpen }) {
 
         {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-auto">
-              <Link to="/" className="flex items-center gap-2 px-4 py-2 text-gray-700 rounded hover:bg-gray-100 transition"> <FaTachometerAlt /> DashBoard</Link>
+              <Link to="/" onClick={() => setSidebarOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-700 rounded hover:bg-gray-100 transition"> <FaTachometerAlt /> DashBoard</Link>
           {/* Users */}
           <button 
             onClick={() => toggleDropdown("users")} 
@@ -57,7 +61,7 @@ export default function Sidebar({ user, sidebarOpen, setSidebarOpen }) {
           </button>
           <div className={`pl-8 flex flex-col space-y-1 mt-1 overflow-hidden transition-all duration-300 ${dropdowns.users ? "max-h-40" : "max-h-0"}`}>
             {/* <Link to="/users/add" className="text-gray-600 hover:text-blue-600">Add User</Link> */}
-            <Link to="/users/list" className="text-gray-600 hover:text-blue-600">View Users</Link>
+            <Link to="/users/list" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">View Users</Link>
           </div>
 
           {/* Inventory */}
@@ -69,9 +73,9 @@ export default function Sidebar({ user, sidebarOpen, setSidebarOpen }) {
             <FaAngleDown className={`${dropdowns.inventory ? "rotate-180" : "rotate-0"} transition-transform`} />
           </button>
           <div className={`pl-8 flex flex-col space-y-1 mt-1 overflow-hidden transition-all duration-300 ${dropdowns.inventory ? "max-h-40" : "max-h-0"}`}>
-            <Link to="/inventory/stock-category" className="text-gray-600 hover:text-blue-600">Stock Categories</Link>
-            <Link to="/inventory/stock-item-category-group" className="text-gray-600 hover:text-blue-600">Items Category Group</Link>
-            <Link to="/inventory/stock-item-category" className="text-gray-600 hover:text-blue-600">Stock item category</Link>
+            <Link to="/inventory/stock-category" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Stock Categories</Link>
+            <Link to="/inventory/stock-item-category-group" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Items Category Group</Link>
+            <Link to="/inventory/stock-item-category" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Stock item category</Link>
           </div>
           
            {/* Stock */}
@@ -83,9 +87,9 @@ export default function Sidebar({ user, sidebarOpen, setSidebarOpen }) {
             <FaAngleDown className={`${dropdowns.stock ? "rotate-180" : "rotate-0"} transition-transform`} />
           </button>
           <div className={`pl-8 flex flex-col space-y-1 mt-1 overflow-hidden transition-all duration-300 ${dropdowns.stock ? "max-h-40" : "max-h-0"}`}>
-            <Link to="/inventory/stock" className="text-gray-600 hover:text-blue-600">Stock Availabe</Link>
-            <Link to="/inventory/stock-in" className="text-gray-600 hover:text-blue-600">Stock in</Link>
-            <Link to="/inventory/stock-out" className="text-gray-600 hover:text-blue-600">Stock out</Link>
+            <Link to="/inventory/stock" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Stock Availabe</Link>
+            <Link to="/inventory/stock-in" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Stock in</Link>
+            <Link to="/inventory/stock-out" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Stock out</Link>
           </div>
 
           {/* Menu */}
@@ -97,10 +101,10 @@ export default function Sidebar({ user, sidebarOpen, setSidebarOpen }) {
             <FaAngleDown className={`${dropdowns.menu ? "rotate-180" : "rotate-0"} transition-transform`} />
           </button>
           <div className={`pl-8 flex flex-col space-y-1 mt-1 overflow-hidden transition-all duration-300 ${dropdowns.menu ? "max-h-40" : "max-h-0"}`}>
-            <Link to="/menu/menu-category-group" className="text-gray-600 hover:text-blue-600">Menu Group</Link>
-            <Link to="/menu/menu-category" className="text-gray-600 hover:text-blue-600">Menu Category</Link>
-            <Link to="/menu/menu" className="text-gray-600 hover:text-blue-600">Menu</Link>
-            <Link to="/menu/menu-items" className="text-gray-600 hover:text-blue-600">Menu Items</Link>
+            <Link to="/menu/menu-category-group" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Menu Group</Link>
+            <Link to="/menu/menu-category" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Menu Category</Link>
+            <Link to="/menu/menu" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Menu</Link>
+            <Link to="/menu/menu-items" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Menu Items</Link>
 
           </div>
 
@@ -115,8 +119,8 @@ export default function Sidebar({ user, sidebarOpen, setSidebarOpen }) {
             <FaAngleDown className={`${dropdowns.table ? "rotate-180" : "rotate-0"} transition-transform`} />
           </button>
           <div className={`pl-8 flex flex-col space-y-1 mt-1 overflow-hidden transition-all duration-300 ${dropdowns.table ? "max-h-40" : "max-h-0"}`}>
-            <Link to="/table/table-groups" className="text-gray-600 hover:text-blue-600">Table Group</Link>
-            <Link to="/table/table-data" className="text-gray-600 hover:text-blue-600">Table Available</Link>
+            <Link to="/table/table-groups" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Table Group</Link>
+            <Link to="/table/table-data" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Table Available</Link>
           </div>
 
 
@@ -130,15 +134,15 @@ export default function Sidebar({ user, sidebarOpen, setSidebarOpen }) {
             <FaAngleDown className={`${dropdowns.orders ? "rotate-180" : "rotate-0"} transition-transform`} />
           </button>
           <div className={`pl-8 flex flex-col space-y-1 mt-1 overflow-hidden transition-all duration-300 ${dropdowns.orders ? "max-h-40" : "max-h-0"}`}>
-            <Link to="/orders/order-type" className="text-gray-600 hover:text-blue-600">Order type</Link>
-            <Link to="/orders/order-special" className="text-gray-600 hover:text-blue-600">Special Order</Link>
-            <Link to="/orders/pos" className="text-gray-600 hover:text-blue-600">Make Order</Link>
-            <Link to="/orders/report" className="text-gray-600 hover:text-blue-600">Report</Link>
-            <Link to="/orders/approval" className="text-gray-600 hover:text-blue-600">Approval</Link>
+            <Link to="/orders/order-type" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Order type</Link>
+            <Link to="/orders/order-special" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Special Order</Link>
+            <Link to="/orders/pos" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Make Order</Link>
+            <Link to="/orders/report" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Report</Link>
+            <Link to="/orders/approval" onClick={() => setSidebarOpen(false)} className="text-gray-600 hover:text-blue-600">Approval</Link>
           </div>
           {/* Other links */}
-          <Link to="/reports" className="flex items-center gap-2 px-4 py-2 text-gray-700 rounded hover:bg-gray-100 transition"><FaChartBar /> Reports</Link>
-          <Link to="#" className="flex items-center gap-2 px-4 py-2 text-gray-700 rounded hover:bg-gray-100 transition"><FaMoneyCheck /> Payments</Link>
+          <Link to="/reports" onClick={() => setSidebarOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-700 rounded hover:bg-gray-100 transition"><FaChartBar /> Reports</Link>
+          <Link to="#" onClick={() => setSidebarOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-700 rounded hover:bg-gray-100 transition"><FaMoneyCheck /> Payments</Link>
         </nav>
       </aside>
     </>

@@ -23,7 +23,7 @@ export default function Orders() {
             setCategory={setCategory}
           />
 
-          {category && <TableSelector setTable={setTable} />}
+          {category && <TableSelector setTable={setTable} selectedTable={table} />}
 
           {category && table && (
             <MenuList
@@ -41,6 +41,7 @@ export default function Orders() {
             <Cart
               table={table}
               tableOrders={tableOrders}
+              setTableOrders={setTableOrders}
             />
           )}
         </div>

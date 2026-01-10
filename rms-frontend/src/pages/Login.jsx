@@ -44,19 +44,31 @@ export default function Login() {
     if (!validate()) return;
 
     setLoading(true);
-    const res = await loginRequest(email, password);
+    let res;
+    try {
+      res = await loginRequest(email, password);
+    } catch (err) {
+      console.error('Login error', err);
+      Swal.fire({ icon: 'error', title: 'Login Failed', text: err.message || 'Network error' });
+      setLoading(false);
+      return;
+    }
 
-    if (res.status === "success") {
-      login(res.data); 
+    if (res?.status === "success") {
+      login(res.data);
+      const title = res.message || 'Login Successful';
+      const nameText = res.data?.names || `${res.data?.firstname || ''} ${res.data?.lastname || ''}`.trim();
+      const text = nameText ? `Welcome ${nameText}` : (res.message || 'You have been logged in');
       Swal.fire({
         icon: "success",
-        title: "Login Successful",
-        text: `Welcome ${res.data.names}`,
-        timer: 1500,
+        title,
+        text,
+        timer: 3000,
         showConfirmButton: false
       }).then(() => navigate("/dashboard"));
     } else {
-      Swal.fire({ icon: "error", title: "Login Failed", text: res.message });
+      const msg = res?.message || 'Login failed';
+      Swal.fire({ icon: "error", title: "Login Failed", text: msg });
     }
     setLoading(false);
   };
@@ -85,6 +97,8 @@ export default function Login() {
         icon: "success",
         title: "Check your email",
         text: "A password reset link has been sent",
+        timer: 3000,
+        showConfirmButton: false
       });
       setShowForgot(false);
       setForgotEmail("");

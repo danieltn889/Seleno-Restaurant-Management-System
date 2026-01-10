@@ -5,6 +5,7 @@ use Models\Order;
 use Models\OrderType;
 use Models\SpecialOrder;
 use Models\OrderItem;
+use PDO;
 
 class OrderController extends BaseController {
     private $orderModel;
@@ -38,7 +39,12 @@ class OrderController extends BaseController {
     public function updateOrderType($params = []) {
         $requestData = json_decode(file_get_contents('php://input'), true);
         $model = new OrderType();
-        $success = $model->update($requestData['order_type_id'], $requestData);
+        
+        // Remove the primary key from the data to avoid updating it
+        $id = $requestData['order_type_id'];
+        unset($requestData['order_type_id']);
+        
+        $success = $model->update($id, $requestData);
         return $success ? $this->success('Order type updated') : $this->error('Failed to update order type');
     }
     
@@ -51,6 +57,8 @@ class OrderController extends BaseController {
     
     public function addSpecialOrder($params = []) {
         $requestData = json_decode(file_get_contents('php://input'), true);
+        // Remove userid from requestData if it exists, since the table might not have it yet
+        unset($requestData['userid']);
         $model = new SpecialOrder();
         $id = $model->create($requestData);
         return $id ? $this->success('Special order added') : $this->error('Failed to add special order');
@@ -65,8 +73,18 @@ class OrderController extends BaseController {
     public function updateSpecialOrder($params = []) {
         $requestData = json_decode(file_get_contents('php://input'), true);
         $model = new SpecialOrder();
-        $success = $model->update($requestData['special_order_id'], $requestData);
-        return $success ? $this->success('Special order updated') : $this->error('Failed to update special order');
+
+        // Remove the primary key from the data to avoid updating it
+        $id = $requestData['special_order_id'];
+        unset($requestData['special_order_id']);
+
+        $success = $model->update($id, $requestData);
+        if ($success) {
+            // Return the updated record
+            $updatedRecord = $model->find($id);
+            return $this->success('Special order updated', $updatedRecord);
+        }
+        return $this->error('Failed to update special order');
     }
     
     public function deleteSpecialOrder($params = []) {
@@ -115,14 +133,40 @@ class OrderController extends BaseController {
     
     public function listOrders($params = []) {
         $model = new Order();
-        $data = $model->findAll();
-        return $this->success('Orders listed', $data);
+        $query = "SELECT o.*, ot.order_type_name, t.table_desc, CONCAT(u.firstname, ' ', u.lastname) as user_names, tg.table_group_name
+                  FROM orders o
+                  LEFT JOIN order_type ot ON o.order_type_id = ot.order_type_id
+                  LEFT JOIN tables_available t ON o.table_id = t.table_id
+                  LEFT JOIN users u ON o.userid = u.userid
+                  LEFT JOIN tables_group tg ON t.table_group_id = tg.table_group_id
+                  ORDER BY o.created_at DESC";
+        $stmt = $model->getDb()->prepare($query);
+        $stmt->execute();
+        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Get items for each order
+        foreach ($orders as &$order) {
+            $orderItemsQuery = "SELECT oi.order_qty as qty, oi.order_item_price as price, m.menu_name as name
+                               FROM order_items oi
+                               LEFT JOIN menu m ON oi.menu_id = m.menu_id
+                               WHERE oi.order_id = ?";
+            $stmt = $model->getDb()->prepare($orderItemsQuery);
+            $stmt->execute([$order['order_id']]);
+            $order['items'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+        
+        return $this->success('Orders listed', $orders);
     }
     
     public function updateOrder($params = []) {
         $requestData = json_decode(file_get_contents('php://input'), true);
         $model = new Order();
-        $success = $model->update($requestData['order_id'], $requestData);
+        
+        // Remove the primary key from the data to avoid updating it
+        $id = $requestData['order_id'];
+        unset($requestData['order_id']);
+        
+        $success = $model->update($id, $requestData);
         return $success ? $this->success('Order updated') : $this->error('Failed to update order');
     }
     
@@ -162,5 +206,47 @@ class OrderController extends BaseController {
         $model = new OrderItem();
         $id = $model->create($requestData);
         return $id ? $this->success('Order item added') : $this->error('Failed to add order item');
+    }
+    
+    public function listOrderItems($params = []) {
+        $order_id = $_GET['order_id'] ?? null;
+        if (!$order_id) {
+            return $this->error('Order ID is required');
+        }
+        
+        $model = new OrderItem();
+        $items = $model->findByOrderId($order_id);
+        return $this->success('Order items retrieved', $items);
+    }
+    
+    public function updateOrderItem($params = []) {
+        $requestData = json_decode(file_get_contents('php://input'), true);
+        
+        $required = ['order_item_id'];
+        foreach ($required as $field) {
+            if (!isset($requestData[$field])) {
+                return $this->error("The field '$field' is required and cannot be empty");
+            }
+        }
+        
+        $model = new OrderItem();
+        
+        // Remove the primary key from the data to avoid updating it
+        $id = $requestData['order_item_id'];
+        unset($requestData['order_item_id']);
+        
+        $success = $model->update($id, $requestData);
+        return $success ? $this->success('Order item updated') : $this->error('Failed to update order item');
+    }
+    
+    public function deleteOrderItem($params = []) {
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            return $this->error('Order item ID is required');
+        }
+        
+        $model = new OrderItem();
+        $success = $model->delete($id);
+        return $success ? $this->success('Order item deleted') : $this->error('Failed to delete order item');
     }
 }

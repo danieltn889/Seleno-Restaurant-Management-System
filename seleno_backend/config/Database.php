@@ -76,6 +76,53 @@ class Database {
             if ($count == 0) {
                 $this->insertSampleData();
             }
+            
+            // Ensure required columns exist
+            $this->ensureRequiredColumns();
+            $this->updateTableSchema();
+        }
+    }
+    
+    private function ensureRequiredColumns() {
+        try {
+            // Check and add user_phone column if missing
+            $result = $this->connection->query("DESCRIBE users");
+            $columns = $result->fetchAll(PDO::FETCH_ASSOC);
+            
+            $hasUserPhone = false;
+            foreach ($columns as $column) {
+                if ($column['Field'] === 'user_phone') {
+                    $hasUserPhone = true;
+                    break;
+                }
+            }
+            
+            if (!$hasUserPhone) {
+                // Add the user_phone column
+                $this->connection->exec("ALTER TABLE users ADD COLUMN user_phone VARCHAR(20)");
+                error_log("user_phone column added to users table");
+            }
+
+            // Ensure payments table has partial_reason to record reason for partial payments
+            try {
+                $result = $this->connection->query("DESCRIBE payments");
+                $payColumns = $result->fetchAll(PDO::FETCH_ASSOC);
+                $hasPartialReason = false;
+                foreach ($payColumns as $col) {
+                    if ($col['Field'] === 'partial_reason') {
+                        $hasPartialReason = true;
+                        break;
+                    }
+                }
+                if (!$hasPartialReason) {
+                    $this->connection->exec("ALTER TABLE payments ADD COLUMN partial_reason TEXT NULL");
+                    error_log("partial_reason column added to payments table");
+                }
+            } catch (Exception $e) {
+                error_log("Error ensuring partial_reason column: " . $e->getMessage());
+            }
+        } catch (Exception $e) {
+            error_log("Error checking/adding user_phone column: " . $e->getMessage());
         }
     }
     
@@ -103,6 +150,67 @@ class Database {
         }
     }
     
+    private function updateTableSchema() {
+        try {
+            // Check if tables_available has table_group_name column and rename it to table_name
+            $result = $this->connection->query("DESCRIBE tables_available");
+            $columns = $result->fetchAll(PDO::FETCH_ASSOC);
+            
+            $hasTableGroupName = false;
+            $hasTableName = false;
+            foreach ($columns as $column) {
+                if ($column['Field'] === 'table_group_name') {
+                    $hasTableGroupName = true;
+                }
+                if ($column['Field'] === 'table_name') {
+                    $hasTableName = true;
+                }
+            }
+            
+            if ($hasTableGroupName && !$hasTableName) {
+                // Rename table_group_name to table_name
+                $this->connection->exec("ALTER TABLE tables_available CHANGE table_group_name table_name VARCHAR(255)");
+                error_log("Renamed table_group_name to table_name in tables_available table");
+            }
+            
+            // Check and add userid column to special_order table
+            $result = $this->connection->query("DESCRIBE special_order");
+            $columns = $result->fetchAll(PDO::FETCH_ASSOC);
+            
+            $hasUserId = false;
+            foreach ($columns as $column) {
+                if ($column['Field'] === 'userid') {
+                    $hasUserId = true;
+                    break;
+                }
+            }
+            
+            if (!$hasUserId) {
+                // Drop and recreate the special_order table with correct schema
+                $this->connection->exec("DROP TABLE IF EXISTS special_order");
+                $this->connection->exec("
+                    CREATE TABLE special_order (
+                        special_order_id INT AUTO_INCREMENT PRIMARY KEY,
+                        special_order_name VARCHAR(255) NOT NULL,
+                        special_order_desc TEXT,
+                        special_order_price DECIMAL(10,2),
+                        special_order_status ENUM('active', 'inactive') DEFAULT 'active',
+                        userid INT NULL,
+                        special_order_created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        special_order_updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    )
+                ");
+                // Re-insert sample data
+                $this->connection->exec("INSERT INTO special_order (special_order_name, special_order_desc, special_order_price, special_order_status, userid) VALUES 
+                    ('Extra Cheese', 'Add extra cheese', 200.00, 'active', 1),
+                    ('Spicy', 'Make it spicy', 100.00, 'active', 1)");
+                error_log("special_order table recreated with userid column");
+            }
+        } catch (Exception $e) {
+            error_log("Error updating table schema: " . $e->getMessage());
+        }
+    }
+    
     private function createTables() {
         $sql = "
         CREATE TABLE roles (
@@ -117,6 +225,7 @@ class Database {
             user_password VARCHAR(255) NOT NULL,
             user_role VARCHAR(255),
             user_status ENUM('active', 'inactive') DEFAULT 'active',
+            user_phone VARCHAR(20),
             session_token VARCHAR(255) NULL,
             user_created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             user_updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -250,7 +359,7 @@ class Database {
         CREATE TABLE tables_available (
             table_id INT AUTO_INCREMENT PRIMARY KEY,
             table_group_id INT,
-            table_group_name VARCHAR(255),
+            table_name VARCHAR(255),
             table_desc TEXT,
             userid INT,
             table_created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -271,7 +380,9 @@ class Database {
             special_order_name VARCHAR(255) NOT NULL,
             special_order_desc TEXT,
             special_order_price DECIMAL(10,2),
-            special_order_status ENUM('active', 'inactive') DEFAULT 'active'
+            special_order_status ENUM('active', 'inactive') DEFAULT 'active',
+            userid INT,
+            FOREIGN KEY (userid) REFERENCES users(userid)
         );
 
         CREATE TABLE orders (
@@ -361,17 +472,17 @@ class Database {
         ('VIP'),
         ('Standard')");
         
-        $this->connection->exec("INSERT INTO tables_available (table_group_id, table_group_name, table_desc) VALUES 
-        (1, 'VIP', 'VIP Table 1'),
-        (2, 'Standard', 'Table 1')");
+        $this->connection->exec("INSERT INTO tables_available (table_group_id, table_name, table_desc) VALUES 
+        (1, 'VIP Table 1', 'VIP Table 1'),
+        (2, 'Standard Table 1', 'Standard Table 1')");
         
         $this->connection->exec("INSERT INTO order_type (order_type_name, order_type_status) VALUES 
         ('Dine In', 'active'),
         ('Take Away', 'active')");
         
-        $this->connection->exec("INSERT INTO special_order (special_order_name, special_order_desc, special_order_price, special_order_status) VALUES 
-        ('Extra Cheese', 'Add extra cheese', 200.00, 'active'),
-        ('Spicy', 'Make it spicy', 100.00, 'active')");
+        $this->connection->exec("INSERT INTO special_order (special_order_name, special_order_desc, special_order_price, special_order_status, userid) VALUES 
+        ('Extra Cheese', 'Add extra cheese', 200.00, 'active', 1),
+        ('Spicy', 'Make it spicy', 100.00, 'active', 1)");
         
         $this->connection->exec("INSERT INTO orders (order_code, order_type_id, userid, table_id, order_status) VALUES 
         ('ORD-2026-001', 1, 1, 1, 'pending'),

@@ -6,5 +6,11 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: 8084,
+    proxy: {
+      '/SRMS': {
+        target: 'http://localhost',
+        changeOrigin: true,
+      },
+    },
   },
 })

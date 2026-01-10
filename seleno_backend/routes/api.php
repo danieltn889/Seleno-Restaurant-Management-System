@@ -37,7 +37,13 @@ return [
 
     // Inventory Management - Stock IN/OUT
     ['POST', '/inventory/stockin/add', 'InventoryController@addStockIn'],
+    ['GET', '/inventory/stockin/list', 'InventoryController@listStockIn'],
+    ['PUT', '/inventory/stockin/update', 'InventoryController@updateStockIn'],
+    ['DELETE', '/inventory/stockin/delete', 'InventoryController@deleteStockIn'],
     ['POST', '/inventory/stockout/add', 'InventoryController@addStockOut'],
+    ['GET', '/inventory/stockout/list', 'InventoryController@listStockOut'],
+    ['PUT', '/inventory/stockout/update', 'InventoryController@updateStockOut'],
+    ['DELETE', '/inventory/stockout/delete', 'InventoryController@deleteStockOut'],
 
     // Menu Management - Category Groups
     ['POST', '/menu/category-group/add', 'MenuController@addMenuCategoryGroup'],
@@ -59,6 +65,9 @@ return [
 
     // Menu Management - Menu Items
     ['POST', '/menu/items/add', 'MenuController@addMenuItem'],
+    ['GET', '/menu/items/list', 'MenuController@listMenuItems'],
+    ['PUT', '/menu/items/update', 'MenuController@updateMenuItem'],
+    ['DELETE', '/menu/items/delete', 'MenuController@deleteMenuItem'],
 
     // Tables Management - Table Groups
     ['POST', '/tables/group/add', 'TableController@addTableGroup'],
@@ -69,6 +78,8 @@ return [
     // Tables Management - Tables
     ['POST', '/tables/add', 'TableController@addTable'],
     ['GET', '/tables/list', 'TableController@listTables'],
+    ['PUT', '/tables/update', 'TableController@updateTable'],
+    ['DELETE', '/tables/delete', 'TableController@deleteTable'],
 
     // Orders Management - Order Types
     ['POST', '/orders/type/add', 'OrderController@addOrderType'],
@@ -90,16 +101,19 @@ return [
 
     // Orders Management - Order Items
     ['POST', '/orders/items/add', 'OrderController@addOrderItem'],
+    ['GET', '/orders/items/list', 'OrderController@listOrderItems'],
+    ['PUT', '/orders/items/update', 'OrderController@updateOrderItem'],
+    ['DELETE', '/orders/items/delete', 'OrderController@deleteOrderItem'],
 
     // Payments
     ['POST', '/payments/add', 'PaymentController@addPayment'],
     ['GET', '/payments/status', 'PaymentController@checkPaymentStatus'],
 
     // Reports
-    ['GET', '/reports/sales.php', 'ReportsController@salesReport'],
-    ['GET', '/reports/inventory.php', 'ReportsController@inventoryReport'],
-    ['GET', '/reports/stock-movement.php', 'ReportsController@stockMovementReport'],
-    ['GET', '/reports/orders.php', 'ReportsController@orderReport'],
-    ['GET', '/reports/payments.php', 'ReportsController@paymentReport'],
-    ['GET', '/reports/user-activity.php', 'ReportsController@userActivityReport'],
+    ['GET', '/reports/sales', 'ReportsController@salesReport'],
+    ['GET', '/reports/inventory', 'ReportsController@inventoryReport'],
+    ['GET', '/reports/stock-movement', 'ReportsController@stockMovementReport'],
+    ['GET', '/reports/orders', 'ReportsController@orderReport'],
+    ['GET', '/reports/payments', 'ReportsController@paymentReport'],
+    ['GET', '/reports/user-activity', 'ReportsController@userActivityReport'],
 ];
